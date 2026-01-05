@@ -1,4 +1,5 @@
 import { Poppins, Geist_Mono } from 'next/font/google'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const poppins = Poppins({
@@ -21,7 +22,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang='en' className={`${poppins.variable} ${geistMono.variable}`}>
-      <body className='antialiased font-sans'>{children}</body>
+      <body className='antialiased font-sans'>
+        {children}
+        <SpeedInsights />
+      </body>
     </html>
   )
 }
