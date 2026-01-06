@@ -1,190 +1,289 @@
 'use client'
+
 import { useState, useEffect } from 'react'
-import { createCalculationAction } from '@/actions/calculations'
 
 export default function Dashboard() {
-  // --- LÓGICA DE FECHA LOCAL (CORRECCIÓN) ---
+  // --- LÓGICA DE FECHA LOCAL ---
+
   const getFechaLocal = () => {
     const hoy = new Date()
+
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(
       2,
+
       '0'
     )}`
   }
-  const hoyStr = getFechaLocal()
 
-  // --- ESTADOS ORIGINALES (CONSERVADOS) ---
+  // --- ESTADOS ---
+
+  const [isMounted, setIsMounted] = useState(false)
+
   const [result, setResult] = useState(null)
+
   const [loading, setLoading] = useState(false)
+
   const [isPulsing, setIsPulsing] = useState(false)
+
   const [formValues, setFormValues] = useState({
     saldoActual: '',
+
     inversionInicial: '',
+
     porcentajeGanancia: '',
+
     gananciaEsperada: ''
   })
+
   const [lastSubmittedValues, setLastSubmittedValues] = useState(null)
+
   const [copiedIndex, setCopiedIndex] = useState(null)
+
   const [errors, setErrors] = useState({})
 
-  // --- ESTADOS DE BITÁCORA Y SALDO ---
   const [activeTab, setActiveTab] = useState('calculadora')
+
   const [sesiones, setSesiones] = useState([])
+
   const [saldoGlobal, setSaldoGlobal] = useState('0.00')
+
   const [bitacoraForm, setBitacoraForm] = useState({
-    fecha: hoyStr, // Usar la fecha local aquí
+    fecha: '',
+
     horaInicio: '',
+
     horaFin: '',
+
     saldoInicial: '',
+
     saldoFinal: '',
+
     notas: ''
   })
 
+  // --- MONTAJE E HIDRATACIÓN (SOLUCIÓN AL ERROR DE CONSOLA) ---
+
   useEffect(() => {
+    setIsMounted(true)
+
+    const hoy = getFechaLocal()
+
     const savedSesiones = localStorage.getItem('binacalc_sesiones')
+
     const savedSaldo = localStorage.getItem('binacalc_saldo_global')
+
     if (savedSesiones) setSesiones(JSON.parse(savedSesiones))
+
     if (savedSaldo) setSaldoGlobal(savedSaldo)
+
+    setBitacoraForm((prev) => ({ ...prev, fecha: hoy }))
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('binacalc_sesiones', JSON.stringify(sesiones))
-  }, [sesiones])
+    if (isMounted) localStorage.setItem('binacalc_sesiones', JSON.stringify(sesiones))
+  }, [sesiones, isMounted])
 
   useEffect(() => {
-    localStorage.setItem('binacalc_saldo_global', saldoGlobal)
-  }, [saldoGlobal])
+    if (isMounted) localStorage.setItem('binacalc_saldo_global', saldoGlobal)
+  }, [saldoGlobal, isMounted])
 
   useEffect(() => {
     if (result) {
       setIsPulsing(true)
+
       const timer = setTimeout(() => setIsPulsing(false), 10000)
+
       return () => clearTimeout(timer)
     }
   }, [result])
 
+  if (!isMounted) return <div className='min-h-screen bg-[#0a0f18]' />
+
+  const hoyStr = getFechaLocal()
+
+  // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
+
+  const handleLocalCalculate = () => {
+    setLoading(true)
+
+    // Simulamos un pequeño delay para el feedback visual del botón
+
+    setTimeout(() => {
+      const { saldoActual, inversionInicial, porcentajeGanancia, gananciaEsperada } = formValues
+
+      const saldoNum = parseFloat(saldoActual)
+
+      const inversionIniNum = parseFloat(inversionInicial)
+
+      const porcentajeNum = parseFloat(porcentajeGanancia)
+
+      const gananciaEspNum = parseFloat(gananciaEsperada)
+
+      let inversiones = []
+
+      let acumulado = 0
+
+      for (let i = 0; i < 20; i++) {
+        let inversion = i === 0 ? inversionIniNum : (acumulado + gananciaEspNum) / (porcentajeNum / 100)
+
+        let ganancia = inversion * (porcentajeNum / 100)
+
+        let siguienteAcumulado = acumulado + inversion
+
+        if (siguienteAcumulado > saldoNum) {
+          const saldoFaltante = (siguienteAcumulado - saldoNum).toFixed(2)
+
+          const saldoSobrante = (saldoNum - acumulado).toFixed(2)
+
+          setResult({
+            resultados: inversiones, // Mantenemos el nombre 'resultados' para el map del JSX
+
+            saldoFaltante,
+
+            saldoSobrante,
+
+            counter: inversiones.length
+          })
+
+          setLoading(false)
+
+          return
+        }
+
+        acumulado = siguienteAcumulado
+
+        inversiones.push({
+          numero: i + 1,
+
+          inversion: inversion.toFixed(2),
+
+          porcentaje: porcentajeNum.toFixed(2),
+
+          ganancia: ganancia.toFixed(2),
+
+          acumulado: acumulado.toFixed(2)
+        })
+      }
+
+      setResult({
+        resultados: inversiones,
+
+        saldoFaltante: '0.00',
+
+        saldoSobrante: (saldoNum - acumulado).toFixed(2),
+
+        counter: inversiones.length
+      })
+
+      setLoading(false)
+    }, 300)
+  }
+
+  // --- MANEJADORES DE EVENTOS ---
+
   const handleChange = (e) => {
     const { name, value } = e.target
+
     setFormValues((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleBitacoraChange = (e) => {
     const { name, value } = e.target
+
     setBitacoraForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleGuardarSesion = (e) => {
     e.preventDefault()
 
-    // Validación usando la fecha local calculada arriba
     if (bitacoraForm.fecha > hoyStr) {
       alert('No puedes registrar sesiones en fechas futuras.')
+
       return
     }
 
     const pnl = parseFloat(bitacoraForm.saldoFinal) - parseFloat(bitacoraForm.saldoInicial)
+
     const timestampFinNueva = new Date(`${bitacoraForm.fecha}T${bitacoraForm.horaFin}`).getTime()
 
-    const nuevaSesion = {
-      ...bitacoraForm,
-      id: Date.now(),
-      pnl: pnl.toFixed(2),
-      timestampFin: timestampFinNueva
-    }
+    const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
 
     const esLaMasReciente =
       sesiones.length === 0 || timestampFinNueva > Math.max(...sesiones.map((s) => s.timestampFin))
+
     if (esLaMasReciente) setSaldoGlobal(bitacoraForm.saldoFinal)
 
     const nuevasSesiones = [...sesiones, nuevaSesion].sort((a, b) => b.timestampFin - a.timestampFin)
+
     setSesiones(nuevasSesiones)
 
-    // Resetear el form manteniendo la fecha local actual
-    setBitacoraForm({
-      fecha: hoyStr,
-      horaInicio: '',
-      horaFin: '',
-      saldoInicial: '',
-      saldoFinal: '',
-      notas: ''
-    })
+    setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
   }
-
-  // Cálculos para la UI
-  const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
-  const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
-  const pnlTotal = sesiones.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
 
   const copyToClipboard = async (value, index) => {
     const textToCopy = value.toString().replace('.', ',')
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(textToCopy)
-        setCopiedIndex(index)
-        setTimeout(() => setCopiedIndex(null), 2000)
-        return
-      } catch (err) {
-        console.error(err)
-      }
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+
+      setCopiedIndex(index)
+
+      setTimeout(() => setCopiedIndex(null), 2000)
+    } catch (err) {
+      const textArea = document.createElement('textarea')
+
+      textArea.value = textToCopy
+
+      document.body.appendChild(textArea)
+
+      textArea.select()
+
+      document.execCommand('copy')
+
+      document.body.removeChild(textArea)
+
+      setCopiedIndex(index)
+
+      setTimeout(() => setCopiedIndex(null), 2000)
     }
-    const textArea = document.createElement('textarea')
-    textArea.value = textToCopy
-    textArea.style.position = 'fixed'
-    textArea.style.left = '-9999px'
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textArea)
-    setCopiedIndex(index)
-    setTimeout(() => setCopiedIndex(null), 2000)
   }
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault()
-    if (loading) return
-    setLoading(true)
-    const dataToSend = new FormData()
-    Object.entries(formValues).forEach(([k, v]) => dataToSend.append(k, v))
-    try {
-      const res = await createCalculationAction(dataToSend)
-      if (res.success) {
-        setResult(res.data)
-        setLastSubmittedValues({ ...formValues })
-      } else {
-        alert(res.error)
-      }
-    } catch (err) {
-      alert('Error de conexión')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
+
+  const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
+
+  const pnlTotal = sesiones.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
 
   return (
-    <div className='min-h-screen lg:h-screen flex flex-col bg-[#0a0f18] text-slate-200 font-sans lg:overflow-hidden'>
+    <div
+      className='min-h-screen lg:h-screen flex flex-col bg-[#0a0f18] text-slate-200 font-sans lg:overflow-hidden'
+      suppressHydrationWarning>
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: #0a0f18;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #1e293b;
+
           border-radius: 10px;
         }
+
         input[type='number'],
         input[type='time'],
         input[type='date'] {
           color-scheme: dark;
         }
+
         button,
-        input[type='button'],
-        input[type='submit'],
         [role='button'] {
           cursor: pointer;
         }
+
         button:disabled {
           cursor: not-allowed;
         }
@@ -197,12 +296,15 @@ export default function Dashboard() {
       </header>
 
       <div className='flex-1 w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:min-h-0 max-w-2xl lg:max-w-[1600px]'>
+        {/* PANEL IZQUIERDO: FORMULARIOS */}
+
         <aside className='lg:col-span-3 h-full min-h-0'>
           <div className='bg-[#161b26] p-6 rounded-2xl border border-slate-800 shadow-xl h-full flex flex-col'>
             <div className='flex items-center justify-between mb-6 border-b border-slate-700 pb-2'>
               <h2 className='text-lg font-semibold text-cyan-500'>
-                {activeTab === 'calculadora' ? 'Calculadora' : 'Nueva Sesión'}
+                {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora de sesiones'}
               </h2>
+
               <button
                 onClick={() => setActiveTab(activeTab === 'calculadora' ? 'bitacora' : 'calculadora')}
                 className='bg-[#0d1117] border border-slate-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
@@ -213,12 +315,14 @@ export default function Dashboard() {
                     }`}>
                     Calc
                   </span>
+
                   <div className='w-4 h-2 bg-slate-700 rounded-full relative'>
                     <div
                       className={`absolute top-0 w-2 h-2 bg-cyan-500 rounded-full transition-all ${
                         activeTab === 'calculadora' ? 'left-0' : 'left-2'
                       }`}></div>
                   </div>
+
                   <span
                     className={`text-[10px] font-bold ${
                       activeTab === 'bitacora' ? 'text-emerald-400' : 'text-slate-500'
@@ -234,52 +338,59 @@ export default function Dashboard() {
                 onSubmit={(e) => {
                   e.preventDefault()
 
-                  // Validar si los valores son idénticos a los de la última consulta
-                  if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) {
-                    return // Bloquea el envío si nada ha cambiado
-                  }
+                  if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
 
                   const newErrors = {}
+
                   const saldo = parseFloat(formValues.saldoActual)
+
                   const inversion = parseFloat(formValues.inversionInicial)
 
-                  // Validaciones lógicas
-                  if (inversion < 1) {
-                    newErrors.inversionInicial = 'Mínimo $1.00'
-                  }
-                  if (inversion > saldo) {
-                    newErrors.inversionInicial = 'No puede superar el saldo'
-                  }
+                  if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
+
+                  if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
 
                   if (Object.keys(newErrors).length > 0) {
                     setErrors(newErrors)
+
                     return
                   }
 
-                  setErrors({}) // Limpiar errores si todo está bien
-                  setLastSubmittedValues({ ...formValues }) // Guardar los valores actuales como enviados
-                  handleFormSubmit(e)
+                  setErrors({})
+
+                  setLastSubmittedValues({ ...formValues })
+
+                  handleLocalCalculate()
                 }}
                 className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'>
                 {[
                   { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
+
                   { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
+
                   {
                     label: 'Porcentaje Broker (%)',
+
                     name: 'porcentajeGanancia',
+
                     placeholder: 'Ej: 80',
+
                     max: '99',
+
                     min: '50'
                   },
+
                   { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
                 ].map((field) => (
                   <div key={field.name} className='space-y-1'>
                     <div className='flex justify-between items-center'>
                       <label className='text-[15px] text-slate-300 font-semibold'>{field.label}</label>
+
                       {errors[field.name] && (
                         <span className='text-[11px] text-rose-400 font-bold animate-pulse'>{errors[field.name]}</span>
                       )}
                     </div>
+
                     <input
                       name={field.name}
                       type='number'
@@ -290,12 +401,11 @@ export default function Dashboard() {
                       value={formValues[field.name]}
                       onChange={(e) => {
                         if (errors[field.name]) setErrors({ ...errors, [field.name]: null })
+
                         handleChange(e)
                       }}
                       onKeyDown={(e) => {
-                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                          e.preventDefault()
-                        }
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
                       }}
                       className={`w-full bg-[#0d1117] border ${
                         errors[field.name] ? 'border-rose-500/50' : 'border-slate-700'
@@ -304,6 +414,7 @@ export default function Dashboard() {
                     />
                   </div>
                 ))}
+
                 <button
                   type='submit'
                   disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
@@ -317,6 +428,7 @@ export default function Dashboard() {
                 className='flex-1 flex flex-col gap-2.5 lg:overflow-y-auto pr-1 custom-scrollbar'>
                 <div className='flex items-center justify-between py-1'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Fecha</label>
+
                   <input
                     name='fecha'
                     type='date'
@@ -331,6 +443,7 @@ export default function Dashboard() {
                 <div className='grid grid-cols-2 gap-4 py-1'>
                   <div className='flex flex-col gap-1.5'>
                     <label className='text-[12px] text-slate-300 font-bold'>Hora inicio</label>
+
                     <input
                       name='horaInicio'
                       type='time'
@@ -340,8 +453,10 @@ export default function Dashboard() {
                       className='w-full bg-[#0d1117] border border-slate-700 rounded-lg px-2 py-1.5 text-white text-sm outline-none focus:border-emerald-500'
                     />
                   </div>
+
                   <div className='flex flex-col gap-1.5'>
                     <label className='text-[12px] text-slate-300 font-bold'>Hora fin</label>
+
                     <input
                       name='horaFin'
                       type='time'
@@ -355,6 +470,7 @@ export default function Dashboard() {
 
                 <div className='flex items-center justify-between py-2 border-b border-slate-800/50'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Saldo inicial</label>
+
                   <input
                     name='saldoInicial'
                     type='number'
@@ -370,6 +486,7 @@ export default function Dashboard() {
 
                 <div className='flex items-center justify-between py-2 border-b border-slate-800/50'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Saldo final</label>
+
                   <input
                     name='saldoFinal'
                     type='number'
@@ -385,6 +502,7 @@ export default function Dashboard() {
 
                 <div className='space-y-1.5 mt-1'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Notas</label>
+
                   <textarea
                     name='notas'
                     value={bitacoraForm.notas}
@@ -404,51 +522,58 @@ export default function Dashboard() {
           </div>
         </aside>
 
+        {/* PANEL CENTRAL: RESULTADOS / HISTORIAL */}
+
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
             <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
               {[
                 {
                   label: 'Hoy',
+
                   val: pnlHoy,
+
                   color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-400' : 'text-rose-400',
+
                   prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '$'
                 },
+
                 {
                   label: 'Histórico',
+
                   val: pnlTotal,
+
                   color: parseFloat(pnlTotal) >= 0 ? 'text-cyan-400' : 'text-rose-400',
+
                   prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '$'
                 },
+
                 { label: 'Sesiones hoy', val: sesionesHoy.length, color: 'text-blue-400', prefix: '' }
               ].map((card, i) => (
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                   <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
+
                   <p className={`text-sm md:text-base font-mono font-bold ${card.color}`}>
                     {card.prefix}
+
                     {card.val}
                   </p>
                 </div>
               ))}
+
               <div className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                 <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>Saldo</p>
+
                 <div className='flex items-center justify-center gap-1'>
                   <span className='text-xs text-white'>$</span>
+
                   <input
                     type='number'
                     step='any'
-                    min='0'
                     value={saldoGlobal}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      if (val === '' || parseFloat(val) >= 0) {
-                        setSaldoGlobal(val)
-                      }
-                    }}
+                    onChange={(e) => setSaldoGlobal(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                        e.preventDefault()
-                      }
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
                     }}
                     style={{ width: `${Math.max(4, (saldoGlobal || '').toString().length + 2)}ch` }}
                     className='bg-transparent font-mono font-bold text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
@@ -464,19 +589,25 @@ export default function Dashboard() {
                 <div className='flex-none flex items-center justify-between bg-[#161b26] p-2 rounded-2xl border border-slate-800 shadow-xl'>
                   <div className='text-center border-r border-slate-700 flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold'>Operaciones</p>
+
                     <p className='text-base font-bold text-emerald-400'>{result.counter}</p>
                   </div>
+
                   <div className='text-center border-r border-slate-700 flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold'>Sobrante</p>
-                    <p className='text-base font-mono text-blue-400'>${Number(result.saldoSobrante).toFixed(2)}</p>
+
+                    <p className='text-base font-mono text-blue-400'>${result.saldoSobrante}</p>
                   </div>
+
                   <div className='text-center flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold tracking-tighter'>
                       Faltante op. {result.counter + 1}
                     </p>
-                    <p className='text-base font-mono text-rose-400'>${Number(result.saldoFaltante).toFixed(2)}</p>
+
+                    <p className='text-base font-mono text-rose-400'>${result.saldoFaltante}</p>
                   </div>
                 </div>
+
                 <div
                   className={`flex-none bg-cyan-950/20 border border-cyan-800/30 px-4 py-2 rounded-xl flex items-center justify-center gap-2 transition-all ${
                     isPulsing ? 'animate-pulse' : ''
@@ -485,6 +616,7 @@ export default function Dashboard() {
                     Calma, solo necesitas acertar una de {result.counter}.
                   </p>
                 </div>
+
                 <div className='flex-1 lg:overflow-y-auto pr-2 custom-scrollbar space-y-2'>
                   {result.resultados.map((op, index) => (
                     <div
@@ -494,44 +626,78 @@ export default function Dashboard() {
                         <div className='bg-[#0d1117] text-slate-300 group-hover:text-cyan-400 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold border border-slate-800'>
                           {index + 1}
                         </div>
+
                         <div>
-                          <p className='text-[11px] text-slate-300 font-bold'>Monto Inv.</p>
-                          <div className='flex items-center gap-0'>
-                            <p className='font-mono text-sm md:text-lg text-blue-300'>
-                              ${Number(op.inversion).toFixed(2)}
-                            </p>
-                            <button
-                              onClick={() => copyToClipboard(op.inversion, index)}
-                              className={`p-1 ${copiedIndex === index ? 'text-emerald-400' : 'text-slate-300'}`}>
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                width='14'
-                                height='14'
-                                viewBox='0 0 24 24'
-                                fill='none'
-                                stroke='currentColor'
-                                strokeWidth='2.5'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'>
-                                <rect x='9' y='9' width='13' height='13' rx='2' ry='2'></rect>
-                                <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'></path>
-                              </svg>
-                            </button>
+                          <p className='text-[9px] text-slate-500 uppercase font-bold mb-0.5'>Monto Inv.</p>
+
+                          <div className='flex items-center gap-2'>
+                            <p className='font-mono text-lg text-blue-300'>${op.inversion}</p>
+
+                            {/* Contenedor del botón con Tooltip */}
+
+                            <div className='relative flex items-center group/tooltip'>
+                              <button
+                                type='button'
+                                onClick={() => copyToClipboard(op.inversion, index)}
+                                className={`p-1 rounded transition-all ${
+                                  copiedIndex === index ? 'text-emerald-400' : 'text-slate-500 hover:text-white'
+                                }`}>
+                                {copiedIndex === index ? (
+                                  <svg
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    width='14'
+                                    height='14'
+                                    viewBox='0 0 24 24'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2.5'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'>
+                                    <polyline points='20 6 9 17 4 12'></polyline>
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    width='14'
+                                    height='14'
+                                    viewBox='0 0 24 24'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2.5'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'>
+                                    <rect x='9' y='9' width='13' height='13' rx='2' ry='2'></rect>
+
+                                    <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'></path>
+                                  </svg>
+                                )}
+                              </button>
+
+                              {/* Etiqueta flotante (Tooltip) */}
+
+                              <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
+                                {copiedIndex === index ? 'Copiado' : 'Copiar'}
+
+                                {/* Triangulito del tooltip */}
+
+                                <span className='absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800'></span>
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
+
                       <div className='flex gap-2 md:gap-8'>
                         <div className='text-right'>
                           <p className='text-[11px] text-slate-300 font-bold'>Ganancia</p>
-                          <p className='font-mono text-[12px] md:text-base text-emerald-500'>
-                            ${Number(op.ganancia).toFixed(2)}
-                          </p>
+
+                          <p className='font-mono text-[12px] md:text-base text-emerald-500'>${op.ganancia}</p>
                         </div>
+
                         <div className='text-right pl-2 md:pl-4'>
                           <p className='text-[11px] text-slate-300 font-bold'>Acumulado</p>
-                          <p className='font-mono text-[12px] md:text-base text-blue-500'>
-                            ${Number(op.acumulado).toFixed(2)}
-                          </p>
+
+                          <p className='font-mono text-[12px] md:text-base text-blue-500'>${op.acumulado}</p>
                         </div>
                       </div>
                     </div>
@@ -539,7 +705,7 @@ export default function Dashboard() {
                 </div>
               </>
             ) : (
-              <div className='flex-1 border-2 border-dashed border-slate-800 rounded-3xl flex items-center justify-center text-slate-600 text-center px-6'>
+              <div className='flex-1 border-2 border-dashed border-slate-800 rounded-3xl flex items-center justify-center text-slate-600 text-center px-6 min-h-[200px]'>
                 Ingresa los parámetros para ver la secuencia
               </div>
             )
@@ -548,7 +714,8 @@ export default function Dashboard() {
               <h3 className='text-sm font-bold text-slate-300 mb-4 border-b border-slate-700 pb-2 text-center uppercase tracking-widest'>
                 HISTORIAL DE SESIONES
               </h3>
-              <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-[900px] lg:max-h-none'>
+
+              <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3'>
                 {sesiones.length > 0 ? (
                   sesiones.map((ses) => (
                     <div
@@ -556,14 +723,13 @@ export default function Dashboard() {
                       className='bg-[#0d1117] px-5 py-3 rounded-xl border border-slate-800 flex flex-col gap-2 hover:border-slate-600 transition-colors'>
                       <div className='flex justify-between items-center'>
                         <span className='text-[12px] text-slate-200 font-bold'>
-                          {/* Formato corto dd-mm-aaaa */}
                           {ses.fecha.split('-').reverse().join('-')} | {ses.horaInicio} a {ses.horaFin}
                         </span>
+
                         <span
                           className={`text-[15px] font-black font-mono ${
                             parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-500'
                           }`}>
-                          {/* Oculta la palabra en móviles, solo muestra el signo y valor */}
                           <span className='hidden md:inline'>
                             {parseFloat(ses.pnl) >= 0 ? 'Ganancia ' : 'Pérdida '}
                           </span>
@@ -571,10 +737,13 @@ export default function Dashboard() {
                           {ses.pnl})
                         </span>
                       </div>
+
                       <div className='flex gap-4 text-[11px] text-slate-300 font-semibold border-t border-slate-800/50 pt-1'>
                         <span>Inicial: ${ses.saldoInicial}</span>
+
                         <span>Final: ${ses.saldoFinal}</span>
                       </div>
+
                       {ses.notas && (
                         <p className='text-xs text-slate-300 italic bg-[#161b26] p-2 rounded'>"{ses.notas}"</p>
                       )}
@@ -596,6 +765,7 @@ export default function Dashboard() {
               Brokers recomendados
             </h2>
             <div className='flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 flex flex-col'>
+              {/* BLOQUE IQ OPTION */}
               <div className='w-full rounded-xl overflow-hidden border border-slate-700 bg-[#0d1117] min-h-[140px] relative group'>
                 <a
                   target='_blank'
@@ -612,6 +782,7 @@ export default function Dashboard() {
                   />
                 </a>
               </div>
+              {/* BLOQUE OLYMP TRADE */}
               <div className='w-full rounded-xl overflow-hidden border border-slate-700 bg-[#0d1117] min-h-[140px] relative group'>
                 <a
                   target='_blank'
