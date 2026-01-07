@@ -1,7 +1,6 @@
- 'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import Header from '@/components/Header'
 import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
@@ -178,7 +177,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Header moved to component to keep page.js clean; styles intact */}
-      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      {}
       {/** Header component preserves all original classes and layout */}
       <Header />
 
@@ -394,12 +393,12 @@ export default function Dashboard() {
 
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
+            <div className='font-semibold grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
               {[
                 {
                   label: 'Hoy',
                   val: pnlHoy,
-                  color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-400' : 'text-rose-400',
+                  color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-400' : 'text-rose-300',
                   prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '$'
                 },
 
@@ -415,7 +414,7 @@ export default function Dashboard() {
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                   <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
 
-                  <p className={`text-sm md:text-base font-mono font-bold ${card.color}`}>
+                  <p className={`text-sm md:text-base font-mono font-semibold ${card.color}`}>
                     {card.prefix}
                     {card.val}
                   </p>
@@ -437,7 +436,7 @@ export default function Dashboard() {
                       if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
                     }}
                     style={{ width: `${Math.max(4, (saldoGlobal || '').toString().length + 2)}ch` }}
-                    className='bg-transparent font-mono font-bold text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
+                    className='bg-transparent font-mono font-semibold text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
                   />
                 </div>
               </div>
@@ -470,9 +469,15 @@ export default function Dashboard() {
                   className={`flex-none bg-cyan-950/20 border border-cyan-800/30 px-4 py-2 rounded-xl flex items-center justify-center gap-2 transition-all ${
                     isPulsing ? 'animate-pulse' : ''
                   }`}>
+                  <span className='text-xs md:text-sm text-slate-100 font-medium text-center hidden md:block'>
+                    ¡Calma!...
+                  </span>
                   <p className='text-xs md:text-sm text-slate-100 font-medium text-center'>
-                    Calma, solo necesitas acertar una de {result.counter}.
+                    Solo necesitas acertar 1 de {result.counter}.
                   </p>
+                  <span className='text-xs md:text-sm font-medium text-cyan-400'>
+                    ({+((1 / result.counter) * 100).toFixed(2)}% de acierto)
+                  </span>
                 </div>
 
                 <div className='flex-1 lg:overflow-y-auto pr-2 custom-scrollbar space-y-2'>
@@ -486,10 +491,9 @@ export default function Dashboard() {
                         </div>
 
                         <div>
-                          <p className='text-[9px] text-slate-500 uppercase font-bold mb-0.5'>Monto Inv.</p>
-
-                          <div className='flex items-center gap-2'>
-                            <p className='font-mono text-lg text-blue-300'>${op.inversion}</p>
+                          <p className='text-[12px] text-slate-300 font-semibold mb-0.5'>Monto Inv.</p>
+                          <div className='flex items-center gap-0.5 md:gap-2'>
+                            <p className='font-mono text-[15px] md:text-lg text-blue-300'>${op.inversion}</p>
 
                             {/* Contenedor del botón con Tooltip */}
 
@@ -497,8 +501,8 @@ export default function Dashboard() {
                               <button
                                 type='button'
                                 onClick={() => copyToClipboard(op.inversion, index)}
-                                className={`p-1 rounded transition-all ${
-                                  copiedIndex === index ? 'text-emerald-400' : 'text-slate-500 hover:text-white'
+                                className={`p-0 rounded transition-all ${
+                                  copiedIndex === index ? 'text-emerald-400' : 'text-slate-500 hover:text-white text'
                                 }`}>
                                 {copiedIndex === index ? (
                                   <svg
@@ -545,17 +549,17 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <div className='flex gap-2 md:gap-8'>
+                      <div className='flex gap-0 md:gap-3'>
                         <div className='text-right'>
-                          <p className='text-[11px] text-slate-300 font-bold'>Ganancia</p>
-
-                          <p className='font-mono text-[12px] md:text-base text-emerald-500'>${op.ganancia}</p>
+                          <p className='text-[11px] text-slate-300 font-semibold'>Ganancia</p>
+                          <p className='font-mono text-[12px] md:text-base text-emerald-500'>{op.ganancia}</p>
                         </div>
 
                         <div className='text-right pl-2 md:pl-4'>
-                          <p className='text-[11px] text-slate-300 font-bold'>Acumulado</p>
-
-                          <p className='font-mono text-[12px] md:text-base text-blue-500'>${op.acumulado}</p>
+                          <p className='text-[11px] text-slate-300 font-semibold min-w-[75px] md:min-w-[120px]'>
+                            Acumulado
+                          </p>
+                          <p className='font-mono text-[12px] md:text-base text-blue-500'>{op.acumulado}</p>
                         </div>
                       </div>
                     </div>
@@ -585,8 +589,8 @@ export default function Dashboard() {
                         </span>
 
                         <span
-                          className={`text-[15px] font-black font-mono ${
-                            parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                          className={`text-[15px] font-mono ${
+                            parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-300'
                           }`}>
                           <span className='hidden md:inline'>
                             {parseFloat(ses.pnl) >= 0 ? 'Ganancia ' : 'Pérdida '}
