@@ -1,17 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-<<<<<<< HEAD
 import Link from 'next/link'
 
 export default function Dashboard() {
   // --- LÓGICA DE FECHA LOCAL ---
-=======
-
-export default function Dashboard() {
-  // --- LÓGICA DE FECHA LOCAL ---
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const getFechaLocal = () => {
     const hoy = new Date()
 
@@ -23,15 +16,9 @@ export default function Dashboard() {
   }
 
   // --- ESTADOS ---
-<<<<<<< HEAD
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-=======
-
-  const [isMounted, setIsMounted] = useState(false)
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const [result, setResult] = useState(null)
 
   const [loading, setLoading] = useState(false)
@@ -44,12 +31,7 @@ export default function Dashboard() {
     inversionInicial: '',
 
     porcentajeGanancia: '',
-<<<<<<< HEAD
     gananciaExtra: ''
-=======
-
-    gananciaEsperada: ''
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   })
 
   const [lastSubmittedValues, setLastSubmittedValues] = useState(null)
@@ -57,10 +39,6 @@ export default function Dashboard() {
   const [copiedIndex, setCopiedIndex] = useState(null)
 
   const [errors, setErrors] = useState({})
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const [activeTab, setActiveTab] = useState('calculadora')
 
   const [sesiones, setSesiones] = useState([])
@@ -69,10 +47,6 @@ export default function Dashboard() {
 
   const [bitacoraForm, setBitacoraForm] = useState({
     fecha: '',
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     horaInicio: '',
 
     horaFin: '',
@@ -85,18 +59,9 @@ export default function Dashboard() {
   })
 
   // --- MONTAJE E HIDRATACIÓN (SOLUCIÓN AL ERROR DE CONSOLA) ---
-<<<<<<< HEAD
   useEffect(() => {
     setIsMounted(true)
     const hoy = getFechaLocal()
-=======
-
-  useEffect(() => {
-    setIsMounted(true)
-
-    const hoy = getFechaLocal()
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     const savedSesiones = localStorage.getItem('binacalc_sesiones')
 
     const savedSaldo = localStorage.getItem('binacalc_saldo_global')
@@ -104,10 +69,6 @@ export default function Dashboard() {
     if (savedSesiones) setSesiones(JSON.parse(savedSesiones))
 
     if (savedSaldo) setSaldoGlobal(savedSaldo)
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     setBitacoraForm((prev) => ({ ...prev, fecha: hoy }))
   }, [])
 
@@ -134,15 +95,10 @@ export default function Dashboard() {
   const hoyStr = getFechaLocal()
 
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const handleLocalCalculate = () => {
     setLoading(true)
 
     // Simulamos un pequeño delay para el feedback visual del botón
-<<<<<<< HEAD
     setTimeout(() => {
       const { saldoActual, inversionInicial, porcentajeGanancia, gananciaExtra } = formValues
 
@@ -152,115 +108,48 @@ export default function Dashboard() {
       const gananciaEspNum = parseFloat(gananciaExtra)
 
       let inversiones = []
-=======
-
-    setTimeout(() => {
-      const { saldoActual, inversionInicial, porcentajeGanancia, gananciaEsperada } = formValues
-
-      const saldoNum = parseFloat(saldoActual)
-
-      const inversionIniNum = parseFloat(inversionInicial)
-
-      const porcentajeNum = parseFloat(porcentajeGanancia)
-
-      const gananciaEspNum = parseFloat(gananciaEsperada)
-
-      let inversiones = []
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
       let acumulado = 0
 
       for (let i = 0; i < 20; i++) {
         let inversion = i === 0 ? inversionIniNum : (acumulado + gananciaEspNum) / (porcentajeNum / 100)
-<<<<<<< HEAD
         let ganancia = inversion * (porcentajeNum / 100)
-=======
-
-        let ganancia = inversion * (porcentajeNum / 100)
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         let siguienteAcumulado = acumulado + inversion
 
         if (siguienteAcumulado > saldoNum) {
           const saldoFaltante = (siguienteAcumulado - saldoNum).toFixed(2)
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           const saldoSobrante = (saldoNum - acumulado).toFixed(2)
 
           setResult({
             resultados: inversiones, // Mantenemos el nombre 'resultados' para el map del JSX
-<<<<<<< HEAD
             saldoFaltante,
             saldoSobrante,
             counter: inversiones.length
           })
           setLoading(false)
-=======
-
-            saldoFaltante,
-
-            saldoSobrante,
-
-            counter: inversiones.length
-          })
-
-          setLoading(false)
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           return
         }
 
         acumulado = siguienteAcumulado
-<<<<<<< HEAD
         inversiones.push({
           numero: i + 1,
           inversion: inversion.toFixed(2),
           porcentaje: porcentajeNum.toFixed(2),
           ganancia: ganancia.toFixed(2),
-=======
-
-        inversiones.push({
-          numero: i + 1,
-
-          inversion: inversion.toFixed(2),
-
-          porcentaje: porcentajeNum.toFixed(2),
-
-          ganancia: ganancia.toFixed(2),
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           acumulado: acumulado.toFixed(2)
         })
       }
 
       setResult({
         resultados: inversiones,
-<<<<<<< HEAD
         saldoFaltante: '0.00',
         saldoSobrante: (saldoNum - acumulado).toFixed(2),
         counter: inversiones.length
       })
-=======
-
-        saldoFaltante: '0.00',
-
-        saldoSobrante: (saldoNum - acumulado).toFixed(2),
-
-        counter: inversiones.length
-      })
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
       setLoading(false)
     }, 300)
   }
 
   // --- MANEJADORES DE EVENTOS ---
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const handleChange = (e) => {
     const { name, value } = e.target
 
@@ -275,10 +164,6 @@ export default function Dashboard() {
 
   const handleGuardarSesion = (e) => {
     e.preventDefault()
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     if (bitacoraForm.fecha > hoyStr) {
       alert('No puedes registrar sesiones en fechas futuras.')
 
@@ -287,13 +172,7 @@ export default function Dashboard() {
     const pnl = parseFloat(bitacoraForm.saldoFinal) - parseFloat(bitacoraForm.saldoInicial)
 
     const timestampFinNueva = new Date(`${bitacoraForm.fecha}T${bitacoraForm.horaFin}`).getTime()
-<<<<<<< HEAD
     const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
-=======
-
-    const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     const esLaMasReciente =
       sesiones.length === 0 || timestampFinNueva > Math.max(...sesiones.map((s) => s.timestampFin))
 
@@ -301,7 +180,6 @@ export default function Dashboard() {
     const nuevasSesiones = [...sesiones, nuevaSesion].sort((a, b) => b.timestampFin - a.timestampFin)
 
     setSesiones(nuevasSesiones)
-<<<<<<< HEAD
     setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
   }
 
@@ -325,44 +203,6 @@ export default function Dashboard() {
 
   const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
   const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
-=======
-
-    setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
-  }
-
-  const copyToClipboard = async (value, index) => {
-    const textToCopy = value.toString().replace('.', ',')
-
-    try {
-      await navigator.clipboard.writeText(textToCopy)
-
-      setCopiedIndex(index)
-
-      setTimeout(() => setCopiedIndex(null), 2000)
-    } catch (err) {
-      const textArea = document.createElement('textarea')
-
-      textArea.value = textToCopy
-
-      document.body.appendChild(textArea)
-
-      textArea.select()
-
-      document.execCommand('copy')
-
-      document.body.removeChild(textArea)
-
-      setCopiedIndex(index)
-
-      setTimeout(() => setCopiedIndex(null), 2000)
-    }
-  }
-
-  const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
-
-  const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const pnlTotal = sesiones.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
 
   return (
@@ -659,19 +499,11 @@ export default function Dashboard() {
 
       <div className='flex-1 w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:min-h-0 max-w-2xl lg:max-w-[1600px]'>
         {/* PANEL IZQUIERDO: FORMULARIOS */}
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         <aside className='lg:col-span-3 h-full min-h-0'>
           <div className='bg-[#161b26] p-6 rounded-2xl border border-slate-800 shadow-xl h-full flex flex-col'>
             <div className='flex items-center justify-between mb-6 border-b border-slate-700 pb-2'>
               <h2 className='text-lg font-semibold text-cyan-500'>
-<<<<<<< HEAD
                 {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora'}
-=======
-                {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora de sesiones'}
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
               </h2>
 
               <button
@@ -706,43 +538,21 @@ export default function Dashboard() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
-<<<<<<< HEAD
                   if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
-=======
-
-                  if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   const newErrors = {}
 
                   const saldo = parseFloat(formValues.saldoActual)
 
                   const inversion = parseFloat(formValues.inversionInicial)
-<<<<<<< HEAD
                   if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
                   if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
-=======
-
-                  if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
-
-                  if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   if (Object.keys(newErrors).length > 0) {
                     setErrors(newErrors)
 
                     return
                   }
-<<<<<<< HEAD
                   setErrors({})
                   setLastSubmittedValues({ ...formValues })
-=======
-
-                  setErrors({})
-
-                  setLastSubmittedValues({ ...formValues })
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   handleLocalCalculate()
                 }}
                 className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'>
@@ -762,12 +572,7 @@ export default function Dashboard() {
 
                     min: '50'
                   },
-<<<<<<< HEAD
                   { label: 'Ganancia Extra', name: 'gananciaExtra', min: '0' }
-=======
-
-                  { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                 ].map((field) => (
                   <div key={field.name} className='space-y-1'>
                     <div className='flex justify-between items-center'>
@@ -905,10 +710,6 @@ export default function Dashboard() {
         </aside>
 
         {/* PANEL CENTRAL: RESULTADOS / HISTORIAL */}
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
             <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
@@ -937,12 +738,7 @@ export default function Dashboard() {
               ].map((card, i) => (
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                   <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
-<<<<<<< HEAD
                   <p className={`text-sm md:text-base font-mono ${card.color}`}>
-=======
-
-                  <p className={`text-sm md:text-base font-mono font-bold ${card.color}`}>
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     {card.prefix}
 
                     {card.val}
@@ -984,10 +780,6 @@ export default function Dashboard() {
 
                   <div className='text-center border-r border-slate-700 flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold'>Sobrante</p>
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     <p className='text-base font-mono text-blue-400'>${result.saldoSobrante}</p>
                   </div>
 
@@ -995,10 +787,6 @@ export default function Dashboard() {
                     <p className='text-[14px] text-slate-300 font-semibold tracking-tighter'>
                       Faltante op. {result.counter + 1}
                     </p>
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     <p className='text-base font-mono text-rose-400'>${result.saldoFaltante}</p>
                   </div>
                 </div>
@@ -1026,30 +814,16 @@ export default function Dashboard() {
                         </div>
 
                         <div>
-<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold mb-0.5'>Monto Inv.</p>
                           <div className='flex items-center gap-1 md:gap-2'>
                             <p className='font-mono text-[14px] md:text-lg text-blue-300'>${op.inversion}</p>
 
                             {/* Contenedor del botón con Tooltip */}
-=======
-                          <p className='text-[9px] text-slate-500 uppercase font-bold mb-0.5'>Monto Inv.</p>
-
-                          <div className='flex items-center gap-2'>
-                            <p className='font-mono text-lg text-blue-300'>${op.inversion}</p>
-
-                            {/* Contenedor del botón con Tooltip */}
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                             <div className='relative flex items-center group/tooltip'>
                               <button
                                 type='button'
                                 onClick={() => copyToClipboard(op.inversion, index)}
-<<<<<<< HEAD
                                 className={`p-0 rounded transition-all ${
-=======
-                                className={`p-1 rounded transition-all ${
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                   copiedIndex === index ? 'text-emerald-400' : 'text-slate-500 hover:text-white'
                                 }`}>
                                 {copiedIndex === index ? (
@@ -1077,28 +851,15 @@ export default function Dashboard() {
                                     strokeLinecap='round'
                                     strokeLinejoin='round'>
                                     <rect x='9' y='9' width='13' height='13' rx='2' ry='2'></rect>
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                     <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'></path>
                                   </svg>
                                 )}
                               </button>
 
                               {/* Etiqueta flotante (Tooltip) */}
-<<<<<<< HEAD
                               <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
                                 {copiedIndex === index ? 'Copiado' : 'Copiar'}
                                 {/* Triangulito del tooltip */}
-=======
-
-                              <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
-                                {copiedIndex === index ? 'Copiado' : 'Copiar'}
-
-                                {/* Triangulito del tooltip */}
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                 <span className='absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800'></span>
                               </span>
                             </div>
@@ -1108,22 +869,12 @@ export default function Dashboard() {
 
                       <div className='flex gap-2 md:gap-8'>
                         <div className='text-right'>
-<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold'>Ganancia</p>
-=======
-                          <p className='text-[11px] text-slate-300 font-bold'>Ganancia</p>
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                           <p className='font-mono text-[12px] md:text-base text-emerald-500'>${op.ganancia}</p>
                         </div>
 
                         <div className='text-right pl-2 md:pl-4'>
-<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold'>Acumulado</p>
-=======
-                          <p className='text-[11px] text-slate-300 font-bold'>Acumulado</p>
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                           <p className='font-mono text-[12px] md:text-base text-blue-500'>${op.acumulado}</p>
                         </div>
                       </div>
@@ -1141,10 +892,6 @@ export default function Dashboard() {
               <h3 className='text-sm font-bold text-slate-300 mb-4 border-b border-slate-700 pb-2 text-center uppercase tracking-widest'>
                 HISTORIAL DE SESIONES
               </h3>
-<<<<<<< HEAD
-=======
-
->>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
               <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3'>
                 {sesiones.length > 0 ? (
                   sesiones.map((ses) => (
