@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
+import { validateCalculatorForm } from '@/lib/validators'
+import { saveSesion } from '@/lib/bitacora'
 
 export default function Dashboard() {
   // --- LÓGICA DE FECHA LOCAL ---
@@ -121,22 +123,12 @@ export default function Dashboard() {
 
     if (bitacoraForm.fecha > hoyStr) {
       alert('No puedes registrar sesiones en fechas futuras.')
-
       return
     }
 
-    const pnl = parseFloat(bitacoraForm.saldoFinal) - parseFloat(bitacoraForm.saldoInicial)
+    const { nuevasSesiones, nuevoSaldoGlobal } = saveSesion(bitacoraForm, sesiones, hoyStr)
 
-    const timestampFinNueva = new Date(`${bitacoraForm.fecha}T${bitacoraForm.horaFin}`).getTime()
-
-    const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
-
-    const esLaMasReciente =
-      sesiones.length === 0 || timestampFinNueva > Math.max(...sesiones.map((s) => s.timestampFin))
-
-    if (esLaMasReciente) setSaldoGlobal(bitacoraForm.saldoFinal)
-
-    const nuevasSesiones = [...sesiones, nuevaSesion].sort((a, b) => b.timestampFin - a.timestampFin)
+    if (nuevoSaldoGlobal !== null) setSaldoGlobal(nuevoSaldoGlobal)
 
     setSesiones(nuevasSesiones)
 
@@ -241,19 +233,10 @@ export default function Dashboard() {
 
                   if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
 
-                  const newErrors = {}
-
-                  const saldo = parseFloat(formValues.saldoActual)
-
-                  const inversion = parseFloat(formValues.inversionInicial)
-
-                  if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
-
-                  if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
+                  const newErrors = validateCalculatorForm(formValues)
 
                   if (Object.keys(newErrors).length > 0) {
                     setErrors(newErrors)
-
                     return
                   }
 
