@@ -1,6 +1,8 @@
-'use client'
+ 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Header from '@/components/Header'
 import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
 import { validateCalculatorForm } from '@/lib/validators'
@@ -66,15 +68,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (result) {
       setIsPulsing(true)
-
       const timer = setTimeout(() => setIsPulsing(false), 10000)
-
       return () => clearTimeout(timer)
     }
   }, [result])
-
   if (!isMounted) return <div className='min-h-screen bg-[#0a0f18]' />
-
   const hoyStr = getFechaLocal()
 
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
@@ -85,7 +83,6 @@ export default function Dashboard() {
     // Simulamos un pequeño delay para el feedback visual del botón
     setTimeout(() => {
       const { saldoActual, inversionInicial, porcentajeGanancia, gananciaEsperada } = formValues
-
       const { inversiones, saldoFaltante, saldoSobrante, counter } = calcularInversionesLocal(
         saldoActual,
         inversionInicial,
@@ -108,13 +105,11 @@ export default function Dashboard() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-
     setFormValues((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleBitacoraChange = (e) => {
     const { name, value } = e.target
-
     setBitacoraForm((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -182,11 +177,10 @@ export default function Dashboard() {
         }
       `}</style>
 
-      <header className='flex-none h-16 flex items-center justify-center border-b border-slate-800 bg-[#0a0f18]'>
-        <h1 className='text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
-          BINACALC
-        </h1>
-      </header>
+      {/* Header moved to component to keep page.js clean; styles intact */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      {/** Header component preserves all original classes and layout */}
+      <Header />
 
       <div className='flex-1 w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:min-h-0 max-w-2xl lg:max-w-[1600px]'>
         {/* PANEL IZQUIERDO: FORMULARIOS */}
@@ -200,7 +194,7 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab(activeTab === 'calculadora' ? 'bitacora' : 'calculadora')}
-                className='bg-[#0d1117] border border-slate-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
+                className='bg-[#0d1117] border border-emerald-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
                 <div className='flex items-center gap-1.5 px-2 py-0.5'>
                   <span
                     className={`text-[10px] font-bold ${
@@ -208,19 +202,17 @@ export default function Dashboard() {
                     }`}>
                     Calc
                   </span>
-
                   <div className='w-4 h-2 bg-slate-700 rounded-full relative'>
                     <div
                       className={`absolute top-0 w-2 h-2 bg-cyan-500 rounded-full transition-all ${
                         activeTab === 'calculadora' ? 'left-0' : 'left-2'
                       }`}></div>
                   </div>
-
                   <span
                     className={`text-[10px] font-bold ${
                       activeTab === 'bitacora' ? 'text-emerald-400' : 'text-slate-500'
                     }`}>
-                    Bitac
+                    Bit
                   </span>
                 </div>
               </button>
@@ -241,26 +233,18 @@ export default function Dashboard() {
                   }
 
                   setErrors({})
-
                   setLastSubmittedValues({ ...formValues })
-
                   handleLocalCalculate()
                 }}
                 className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'>
                 {[
                   { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
-
                   { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
-
                   {
                     label: 'Porcentaje Broker (%)',
-
                     name: 'porcentajeGanancia',
-
                     placeholder: 'Ej: 80',
-
                     max: '99',
-
                     min: '50'
                   },
 
