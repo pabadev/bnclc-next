@@ -1,54 +1,113 @@
 'use client'
+
 import { useState, useEffect } from 'react'
+<<<<<<< HEAD
 import Link from 'next/link'
 
 export default function Dashboard() {
   // --- LÓGICA DE FECHA LOCAL ---
+=======
+
+export default function Dashboard() {
+  // --- LÓGICA DE FECHA LOCAL ---
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const getFechaLocal = () => {
     const hoy = new Date()
+
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(
       2,
+
       '0'
     )}`
   }
 
   // --- ESTADOS ---
+<<<<<<< HEAD
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+=======
+
+  const [isMounted, setIsMounted] = useState(false)
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const [result, setResult] = useState(null)
+
   const [loading, setLoading] = useState(false)
+
   const [isPulsing, setIsPulsing] = useState(false)
+
   const [formValues, setFormValues] = useState({
     saldoActual: '',
+
     inversionInicial: '',
+
     porcentajeGanancia: '',
+<<<<<<< HEAD
     gananciaExtra: ''
+=======
+
+    gananciaEsperada: ''
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   })
+
   const [lastSubmittedValues, setLastSubmittedValues] = useState(null)
+
   const [copiedIndex, setCopiedIndex] = useState(null)
+
   const [errors, setErrors] = useState({})
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const [activeTab, setActiveTab] = useState('calculadora')
+
   const [sesiones, setSesiones] = useState([])
+
   const [saldoGlobal, setSaldoGlobal] = useState('0.00')
+
   const [bitacoraForm, setBitacoraForm] = useState({
     fecha: '',
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     horaInicio: '',
+
     horaFin: '',
+
     saldoInicial: '',
+
     saldoFinal: '',
+
     notas: ''
   })
 
   // --- MONTAJE E HIDRATACIÓN (SOLUCIÓN AL ERROR DE CONSOLA) ---
+<<<<<<< HEAD
   useEffect(() => {
     setIsMounted(true)
     const hoy = getFechaLocal()
+=======
+
+  useEffect(() => {
+    setIsMounted(true)
+
+    const hoy = getFechaLocal()
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     const savedSesiones = localStorage.getItem('binacalc_sesiones')
+
     const savedSaldo = localStorage.getItem('binacalc_saldo_global')
 
     if (savedSesiones) setSesiones(JSON.parse(savedSesiones))
+
     if (savedSaldo) setSaldoGlobal(savedSaldo)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     setBitacoraForm((prev) => ({ ...prev, fecha: hoy }))
   }, [])
 
@@ -63,7 +122,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (result) {
       setIsPulsing(true)
+
       const timer = setTimeout(() => setIsPulsing(false), 10000)
+
       return () => clearTimeout(timer)
     }
   }, [result])
@@ -73,10 +134,15 @@ export default function Dashboard() {
   const hoyStr = getFechaLocal()
 
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const handleLocalCalculate = () => {
     setLoading(true)
 
     // Simulamos un pequeño delay para el feedback visual del botón
+<<<<<<< HEAD
     setTimeout(() => {
       const { saldoActual, inversionInicial, porcentajeGanancia, gananciaExtra } = formValues
 
@@ -86,72 +152,156 @@ export default function Dashboard() {
       const gananciaEspNum = parseFloat(gananciaExtra)
 
       let inversiones = []
+=======
+
+    setTimeout(() => {
+      const { saldoActual, inversionInicial, porcentajeGanancia, gananciaEsperada } = formValues
+
+      const saldoNum = parseFloat(saldoActual)
+
+      const inversionIniNum = parseFloat(inversionInicial)
+
+      const porcentajeNum = parseFloat(porcentajeGanancia)
+
+      const gananciaEspNum = parseFloat(gananciaEsperada)
+
+      let inversiones = []
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
       let acumulado = 0
 
       for (let i = 0; i < 20; i++) {
         let inversion = i === 0 ? inversionIniNum : (acumulado + gananciaEspNum) / (porcentajeNum / 100)
+<<<<<<< HEAD
         let ganancia = inversion * (porcentajeNum / 100)
+=======
+
+        let ganancia = inversion * (porcentajeNum / 100)
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         let siguienteAcumulado = acumulado + inversion
 
         if (siguienteAcumulado > saldoNum) {
           const saldoFaltante = (siguienteAcumulado - saldoNum).toFixed(2)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           const saldoSobrante = (saldoNum - acumulado).toFixed(2)
 
           setResult({
             resultados: inversiones, // Mantenemos el nombre 'resultados' para el map del JSX
+<<<<<<< HEAD
             saldoFaltante,
             saldoSobrante,
             counter: inversiones.length
           })
           setLoading(false)
+=======
+
+            saldoFaltante,
+
+            saldoSobrante,
+
+            counter: inversiones.length
+          })
+
+          setLoading(false)
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           return
         }
 
         acumulado = siguienteAcumulado
+<<<<<<< HEAD
         inversiones.push({
           numero: i + 1,
           inversion: inversion.toFixed(2),
           porcentaje: porcentajeNum.toFixed(2),
           ganancia: ganancia.toFixed(2),
+=======
+
+        inversiones.push({
+          numero: i + 1,
+
+          inversion: inversion.toFixed(2),
+
+          porcentaje: porcentajeNum.toFixed(2),
+
+          ganancia: ganancia.toFixed(2),
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
           acumulado: acumulado.toFixed(2)
         })
       }
 
       setResult({
         resultados: inversiones,
+<<<<<<< HEAD
         saldoFaltante: '0.00',
         saldoSobrante: (saldoNum - acumulado).toFixed(2),
         counter: inversiones.length
       })
+=======
+
+        saldoFaltante: '0.00',
+
+        saldoSobrante: (saldoNum - acumulado).toFixed(2),
+
+        counter: inversiones.length
+      })
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
       setLoading(false)
     }, 300)
   }
 
   // --- MANEJADORES DE EVENTOS ---
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const handleChange = (e) => {
     const { name, value } = e.target
+
     setFormValues((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleBitacoraChange = (e) => {
     const { name, value } = e.target
+
     setBitacoraForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleGuardarSesion = (e) => {
     e.preventDefault()
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     if (bitacoraForm.fecha > hoyStr) {
       alert('No puedes registrar sesiones en fechas futuras.')
+
       return
     }
     const pnl = parseFloat(bitacoraForm.saldoFinal) - parseFloat(bitacoraForm.saldoInicial)
+
     const timestampFinNueva = new Date(`${bitacoraForm.fecha}T${bitacoraForm.horaFin}`).getTime()
+<<<<<<< HEAD
     const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
+=======
+
+    const nuevaSesion = { ...bitacoraForm, id: Date.now(), pnl: pnl.toFixed(2), timestampFin: timestampFinNueva }
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
     const esLaMasReciente =
       sesiones.length === 0 || timestampFinNueva > Math.max(...sesiones.map((s) => s.timestampFin))
+
     if (esLaMasReciente) setSaldoGlobal(bitacoraForm.saldoFinal)
     const nuevasSesiones = [...sesiones, nuevaSesion].sort((a, b) => b.timestampFin - a.timestampFin)
+
     setSesiones(nuevasSesiones)
+<<<<<<< HEAD
     setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
   }
 
@@ -175,6 +325,44 @@ export default function Dashboard() {
 
   const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
   const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
+=======
+
+    setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
+  }
+
+  const copyToClipboard = async (value, index) => {
+    const textToCopy = value.toString().replace('.', ',')
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+
+      setCopiedIndex(index)
+
+      setTimeout(() => setCopiedIndex(null), 2000)
+    } catch (err) {
+      const textArea = document.createElement('textarea')
+
+      textArea.value = textToCopy
+
+      document.body.appendChild(textArea)
+
+      textArea.select()
+
+      document.execCommand('copy')
+
+      document.body.removeChild(textArea)
+
+      setCopiedIndex(index)
+
+      setTimeout(() => setCopiedIndex(null), 2000)
+    }
+  }
+
+  const sesionesHoy = sesiones.filter((s) => s.fecha === hoyStr)
+
+  const pnlHoy = sesionesHoy.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
   const pnlTotal = sesiones.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
 
   return (
@@ -185,22 +373,28 @@ export default function Dashboard() {
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: #0a0f18;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #1e293b;
+
           border-radius: 10px;
         }
+
         input[type='number'],
         input[type='time'],
         input[type='date'] {
           color-scheme: dark;
         }
+
         button,
         [role='button'] {
           cursor: pointer;
         }
+
         button:disabled {
           cursor: not-allowed;
         }
@@ -465,12 +659,21 @@ export default function Dashboard() {
 
       <div className='flex-1 w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:min-h-0 max-w-2xl lg:max-w-[1600px]'>
         {/* PANEL IZQUIERDO: FORMULARIOS */}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         <aside className='lg:col-span-3 h-full min-h-0'>
           <div className='bg-[#161b26] p-6 rounded-2xl border border-slate-800 shadow-xl h-full flex flex-col'>
             <div className='flex items-center justify-between mb-6 border-b border-slate-700 pb-2'>
               <h2 className='text-lg font-semibold text-cyan-500'>
+<<<<<<< HEAD
                 {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora'}
+=======
+                {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora de sesiones'}
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
               </h2>
+
               <button
                 onClick={() => setActiveTab(activeTab === 'calculadora' ? 'bitacora' : 'calculadora')}
                 className='bg-[#0d1117] border border-emerald-700 p-0 rounded-lg hover:border-cyan-500 transition-colors'>
@@ -481,12 +684,14 @@ export default function Dashboard() {
                     }`}>
                     Calc
                   </span>
+
                   <div className='w-4 h-2 bg-slate-700 rounded-full relative'>
                     <div
                       className={`absolute top-0 w-2 h-2 bg-cyan-500 rounded-full transition-all ${
                         activeTab === 'calculadora' ? 'left-0' : 'left-2'
                       }`}></div>
                   </div>
+
                   <span
                     className={`text-[12px] font-bold ${
                       activeTab === 'bitacora' ? 'text-emerald-400' : 'text-slate-500'
@@ -501,40 +706,78 @@ export default function Dashboard() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
+<<<<<<< HEAD
                   if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
+=======
+
+                  if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   const newErrors = {}
+
                   const saldo = parseFloat(formValues.saldoActual)
+
                   const inversion = parseFloat(formValues.inversionInicial)
+<<<<<<< HEAD
                   if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
                   if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
+=======
+
+                  if (inversion < 1) newErrors.inversionInicial = 'Mínimo $1.00'
+
+                  if (inversion > saldo) newErrors.inversionInicial = 'No puede superar el saldo'
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   if (Object.keys(newErrors).length > 0) {
                     setErrors(newErrors)
+
                     return
                   }
+<<<<<<< HEAD
                   setErrors({})
                   setLastSubmittedValues({ ...formValues })
+=======
+
+                  setErrors({})
+
+                  setLastSubmittedValues({ ...formValues })
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                   handleLocalCalculate()
                 }}
                 className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'>
                 {[
                   { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
+
                   { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
+
                   {
                     label: 'Porcentaje Broker (%)',
+
                     name: 'porcentajeGanancia',
+
                     placeholder: 'Ej: 80',
+
                     max: '99',
+
                     min: '50'
                   },
+<<<<<<< HEAD
                   { label: 'Ganancia Extra', name: 'gananciaExtra', min: '0' }
+=======
+
+                  { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                 ].map((field) => (
                   <div key={field.name} className='space-y-1'>
                     <div className='flex justify-between items-center'>
                       <label className='text-[15px] text-slate-300 font-semibold'>{field.label}</label>
+
                       {errors[field.name] && (
                         <span className='text-[11px] text-rose-400 font-bold animate-pulse'>{errors[field.name]}</span>
                       )}
                     </div>
+
                     <input
                       name={field.name}
                       type='number'
@@ -545,6 +788,7 @@ export default function Dashboard() {
                       value={formValues[field.name]}
                       onChange={(e) => {
                         if (errors[field.name]) setErrors({ ...errors, [field.name]: null })
+
                         handleChange(e)
                       }}
                       onKeyDown={(e) => {
@@ -557,6 +801,7 @@ export default function Dashboard() {
                     />
                   </div>
                 ))}
+
                 <button
                   type='submit'
                   disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
@@ -570,6 +815,7 @@ export default function Dashboard() {
                 className='flex-1 flex flex-col gap-2.5 lg:overflow-y-auto pr-1 custom-scrollbar'>
                 <div className='flex items-center justify-between py-1'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Fecha</label>
+
                   <input
                     name='fecha'
                     type='date'
@@ -583,6 +829,7 @@ export default function Dashboard() {
                 <div className='grid grid-cols-2 gap-4 py-1'>
                   <div className='flex flex-col gap-1.5'>
                     <label className='text-[12px] text-slate-300 font-bold'>Hora inicio</label>
+
                     <input
                       name='horaInicio'
                       type='time'
@@ -592,8 +839,10 @@ export default function Dashboard() {
                       className='w-full bg-[#0d1117] border border-slate-700 rounded-lg px-2 py-1.5 text-white text-sm outline-none focus:border-emerald-500'
                     />
                   </div>
+
                   <div className='flex flex-col gap-1.5'>
                     <label className='text-[12px] text-slate-300 font-bold'>Hora fin</label>
+
                     <input
                       name='horaFin'
                       type='time'
@@ -606,6 +855,7 @@ export default function Dashboard() {
                 </div>
                 <div className='flex items-center justify-between py-2 border-b border-slate-800/50'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Saldo inicial</label>
+
                   <input
                     name='saldoInicial'
                     type='number'
@@ -620,6 +870,7 @@ export default function Dashboard() {
                 </div>
                 <div className='flex items-center justify-between py-2 border-b border-slate-800/50'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Saldo final</label>
+
                   <input
                     name='saldoFinal'
                     type='number'
@@ -634,6 +885,7 @@ export default function Dashboard() {
                 </div>
                 <div className='space-y-1.5 mt-1'>
                   <label className='text-[13px] text-slate-300 font-semibold'>Notas</label>
+
                   <textarea
                     name='notas'
                     value={bitacoraForm.notas}
@@ -653,36 +905,57 @@ export default function Dashboard() {
         </aside>
 
         {/* PANEL CENTRAL: RESULTADOS / HISTORIAL */}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
             <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
               {[
                 {
                   label: 'Hoy',
+
                   val: pnlHoy,
+
                   color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-400' : 'text-rose-400',
+
                   prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '$'
                 },
+
                 {
                   label: 'Histórico',
+
                   val: pnlTotal,
+
                   color: parseFloat(pnlTotal) >= 0 ? 'text-cyan-400' : 'text-rose-400',
+
                   prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '$'
                 },
+
                 { label: 'Sesiones hoy', val: sesionesHoy.length, color: 'text-blue-400', prefix: '' }
               ].map((card, i) => (
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                   <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
+<<<<<<< HEAD
                   <p className={`text-sm md:text-base font-mono ${card.color}`}>
+=======
+
+                  <p className={`text-sm md:text-base font-mono font-bold ${card.color}`}>
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     {card.prefix}
+
                     {card.val}
                   </p>
                 </div>
               ))}
+
               <div className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                 <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>Saldo</p>
+
                 <div className='flex items-center justify-center gap-1'>
                   <span className='text-xs text-white'>$</span>
+
                   <input
                     type='number'
                     step='any'
@@ -705,19 +978,31 @@ export default function Dashboard() {
                 <div className='flex-none flex items-center justify-between bg-[#161b26] p-2 rounded-2xl border border-slate-800 shadow-xl'>
                   <div className='text-center border-r border-slate-700 flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold'>Operaciones</p>
+
                     <p className='text-base font-bold text-emerald-400'>{result.counter}</p>
                   </div>
+
                   <div className='text-center border-r border-slate-700 flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold'>Sobrante</p>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     <p className='text-base font-mono text-blue-400'>${result.saldoSobrante}</p>
                   </div>
+
                   <div className='text-center flex-1'>
                     <p className='text-[14px] text-slate-300 font-semibold tracking-tighter'>
                       Faltante op. {result.counter + 1}
                     </p>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                     <p className='text-base font-mono text-rose-400'>${result.saldoFaltante}</p>
                   </div>
                 </div>
+
                 <div
                   className={`flex-none bg-cyan-950/20 border border-cyan-800/30 px-4 py-2 rounded-xl flex items-center justify-center gap-2 transition-all ${
                     isPulsing ? 'animate-pulse' : ''
@@ -729,6 +1014,7 @@ export default function Dashboard() {
                     ({+((1 / result.counter) * 100).toFixed(2)}% de acierto)
                   </span>
                 </div>
+
                 <div className='flex-1 lg:overflow-y-auto pr-2 custom-scrollbar space-y-2'>
                   {result.resultados.map((op, index) => (
                     <div
@@ -738,17 +1024,32 @@ export default function Dashboard() {
                         <div className='bg-[#0d1117] text-slate-300 group-hover:text-cyan-400 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold border border-slate-800'>
                           {index + 1}
                         </div>
+
                         <div>
+<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold mb-0.5'>Monto Inv.</p>
                           <div className='flex items-center gap-1 md:gap-2'>
                             <p className='font-mono text-[14px] md:text-lg text-blue-300'>${op.inversion}</p>
 
                             {/* Contenedor del botón con Tooltip */}
+=======
+                          <p className='text-[9px] text-slate-500 uppercase font-bold mb-0.5'>Monto Inv.</p>
+
+                          <div className='flex items-center gap-2'>
+                            <p className='font-mono text-lg text-blue-300'>${op.inversion}</p>
+
+                            {/* Contenedor del botón con Tooltip */}
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                             <div className='relative flex items-center group/tooltip'>
                               <button
                                 type='button'
                                 onClick={() => copyToClipboard(op.inversion, index)}
+<<<<<<< HEAD
                                 className={`p-0 rounded transition-all ${
+=======
+                                className={`p-1 rounded transition-all ${
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                   copiedIndex === index ? 'text-emerald-400' : 'text-slate-500 hover:text-white'
                                 }`}>
                                 {copiedIndex === index ? (
@@ -776,28 +1077,53 @@ export default function Dashboard() {
                                     strokeLinecap='round'
                                     strokeLinejoin='round'>
                                     <rect x='9' y='9' width='13' height='13' rx='2' ry='2'></rect>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                     <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'></path>
                                   </svg>
                                 )}
                               </button>
 
                               {/* Etiqueta flotante (Tooltip) */}
+<<<<<<< HEAD
                               <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
                                 {copiedIndex === index ? 'Copiado' : 'Copiar'}
                                 {/* Triangulito del tooltip */}
+=======
+
+                              <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
+                                {copiedIndex === index ? 'Copiado' : 'Copiar'}
+
+                                {/* Triangulito del tooltip */}
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                                 <span className='absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800'></span>
                               </span>
                             </div>
                           </div>
                         </div>
                       </div>
+
                       <div className='flex gap-2 md:gap-8'>
                         <div className='text-right'>
+<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold'>Ganancia</p>
+=======
+                          <p className='text-[11px] text-slate-300 font-bold'>Ganancia</p>
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                           <p className='font-mono text-[12px] md:text-base text-emerald-500'>${op.ganancia}</p>
                         </div>
+
                         <div className='text-right pl-2 md:pl-4'>
+<<<<<<< HEAD
                           <p className='text-[11px] text-slate-300 font-semibold'>Acumulado</p>
+=======
+                          <p className='text-[11px] text-slate-300 font-bold'>Acumulado</p>
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
                           <p className='font-mono text-[12px] md:text-base text-blue-500'>${op.acumulado}</p>
                         </div>
                       </div>
@@ -815,6 +1141,10 @@ export default function Dashboard() {
               <h3 className='text-sm font-bold text-slate-300 mb-4 border-b border-slate-700 pb-2 text-center uppercase tracking-widest'>
                 HISTORIAL DE SESIONES
               </h3>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 64daaad9dbfaaa1a313f076eb8d4ab73ed647824
               <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3'>
                 {sesiones.length > 0 ? (
                   sesiones.map((ses) => (
@@ -825,6 +1155,7 @@ export default function Dashboard() {
                         <span className='text-[12px] text-slate-200 font-bold'>
                           {ses.fecha.split('-').reverse().join('-')} | {ses.horaInicio} a {ses.horaFin}
                         </span>
+
                         <span
                           className={`text-[15px] font-mono ${
                             parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-500'
@@ -836,10 +1167,13 @@ export default function Dashboard() {
                           {ses.pnl})
                         </span>
                       </div>
+
                       <div className='flex gap-4 text-[11px] text-slate-300 font-semibold border-t border-slate-800/50 pt-1'>
                         <span>Inicial: ${ses.saldoInicial}</span>
+
                         <span>Final: ${ses.saldoFinal}</span>
                       </div>
+
                       {ses.notas && (
                         <p className='text-xs text-slate-300 italic bg-[#161b26] p-2 rounded'>"{ses.notas}"</p>
                       )}
