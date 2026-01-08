@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import CalculatorForm from '@/components/CalculatorForm'
 import ResultsList from '@/components/ResultsList'
 import BitacoraForm from '@/components/BitacoraForm'
+import SessionsHistory from '@/components/SessionsHistory'
 import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
 import { validateCalculatorForm } from '@/lib/validators'
@@ -22,61 +23,16 @@ export default function Dashboard() {
   const [isPulsing, setIsPulsing] = useState(false)
   const [formValues, setFormValues] = useState({
     saldoActual: '',
-    inversionInicial: '',
-    porcentajeGanancia: '',
-    gananciaEsperada: ''
-  })
-  const [lastSubmittedValues, setLastSubmittedValues] = useState(null)
-  const [copiedIndex, setCopiedIndex] = useState(null)
-  const [errors, setErrors] = useState({})
-  const [activeTab, setActiveTab] = useState('calculadora')
+            ) : (
+              <BitacoraForm
+                bitacoraForm={bitacoraForm}
+                onChange={handleBitacoraChange}
+                onSubmit={handleGuardarSesion}
+                hoyStr={hoyStr}
+              />
+            )
   const [sesiones, setSesiones] = useState([])
-  const [saldoGlobal, setSaldoGlobal] = useState('0.00')
-  const [bitacoraForm, setBitacoraForm] = useState({
-    fecha: '',
-    horaInicio: '',
-    horaFin: '',
-    saldoInicial: '',
-    saldoFinal: '',
-    notas: ''
-  })
-
-  // --- MONTAJE E HIDRATACIÓN (SOLUCIÓN AL ERROR DE CONSOLA) ---
-
-  useEffect(() => {
-    setIsMounted(true)
-
-    const hoy = getFechaLocal()
-
-    const savedSesiones = localStorage.getItem('binacalc_sesiones')
-
-    const savedSaldo = localStorage.getItem('binacalc_saldo_global')
-
-    if (savedSesiones) setSesiones(JSON.parse(savedSesiones))
-
-    if (savedSaldo) setSaldoGlobal(savedSaldo)
-
-    setBitacoraForm((prev) => ({ ...prev, fecha: hoy }))
-  }, [])
-
-  useEffect(() => {
-    if (isMounted) localStorage.setItem('binacalc_sesiones', JSON.stringify(sesiones))
-  }, [sesiones, isMounted])
-
-  useEffect(() => {
-    if (isMounted) localStorage.setItem('binacalc_saldo_global', saldoGlobal)
-  }, [saldoGlobal, isMounted])
-
-  useEffect(() => {
-    if (result) {
-      setIsPulsing(true)
-      const timer = setTimeout(() => setIsPulsing(false), 10000)
-      return () => clearTimeout(timer)
-    }
-  }, [result])
-  if (!isMounted) return <div className='min-h-screen bg-[#0a0f18]' />
-  const hoyStr = getFechaLocal()
-
+            <SessionsHistory sesiones={sesiones} />
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
 
   const handleLocalCalculate = () => {
