@@ -16,3 +16,32 @@
     font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif !important;
   }
 }
+
+/* Custom scrollbar and form/button tweaks moved from page.js to avoid styled-jsx hydration mismatches */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0a0f18;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+input[type='number'],
+input[type='time'],
+input[type='date'] {
+  color-scheme: dark;
+}
+
+button,
+[role='button'] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

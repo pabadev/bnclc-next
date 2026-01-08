@@ -141,36 +141,7 @@ export default function Dashboard() {
     <div
       className='min-h-screen lg:h-screen flex flex-col bg-[#0a0f18] text-slate-200 font-sans lg:overflow-hidden'
       suppressHydrationWarning>
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #0a0f18;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #1e293b;
-
-          border-radius: 10px;
-        }
-
-        input[type='number'],
-        input[type='time'],
-        input[type='date'] {
-          color-scheme: dark;
-        }
-
-        button,
-        [role='button'] {
-          cursor: pointer;
-        }
-
-        button:disabled {
-          cursor: not-allowed;
-        }
-      `}</style>
+      {/* global styles moved to src/app/globals.css to avoid styled-jsx hydration issues */}
 
       {/* Header moved to component to keep page.js clean; styles intact */}
       {}
