@@ -24,16 +24,29 @@ export default function Dashboard() {
   const [isPulsing, setIsPulsing] = useState(false)
   const [formValues, setFormValues] = useState({
     saldoActual: '',
-            ) : (
-              <BitacoraForm
-                bitacoraForm={bitacoraForm}
-                onChange={handleBitacoraChange}
-                onSubmit={handleGuardarSesion}
-                hoyStr={hoyStr}
-              />
-            )
+    inversionInicial: '',
+    porcentajeGanancia: '',
+    gananciaEsperada: ''
+  })
+
+  const [errors, setErrors] = useState({})
+  const [lastSubmittedValues, setLastSubmittedValues] = useState({})
+  const [activeTab, setActiveTab] = useState('calculadora')
+
+  const hoyStr = getFechaLocal()
+
+  const [bitacoraForm, setBitacoraForm] = useState({
+    fecha: hoyStr,
+    horaInicio: '',
+    horaFin: '',
+    saldoInicial: '',
+    saldoFinal: '',
+    notas: ''
+  })
+
   const [sesiones, setSesiones] = useState([])
-            <SessionsHistory sesiones={sesiones} />
+  const [saldoGlobal, setSaldoGlobal] = useState('')
+  const [copiedIndex, setCopiedIndex] = useState(null)
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
 
   const handleLocalCalculate = () => {
