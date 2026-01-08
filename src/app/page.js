@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
+import CalculatorForm from '@/components/CalculatorForm'
 import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
 import { validateCalculatorForm } from '@/lib/validators'
@@ -107,6 +108,29 @@ export default function Dashboard() {
     setFormValues((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleFieldChange = (e) => {
+    const { name } = e.target
+    if (errors[name]) setErrors({ ...errors, [name]: null })
+    handleChange(e)
+  }
+
+  const handleCalculatorSubmit = (e) => {
+    e.preventDefault()
+
+    if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
+
+    const newErrors = validateCalculatorForm(formValues)
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
+    setLastSubmittedValues({ ...formValues })
+    handleLocalCalculate()
+  }
+
   const handleBitacoraChange = (e) => {
     const { name, value } = e.target
     setBitacoraForm((prev) => ({ ...prev, [name]: value }))
@@ -178,7 +202,6 @@ export default function Dashboard() {
 
       {/* Header moved to component to keep page.js clean; styles intact */}
       {}
-      {/** Header component preserves all original classes and layout */}
       <Header />
 
       <div className='flex-1 w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:min-h-0 max-w-2xl lg:max-w-[1600px]'>
@@ -218,77 +241,14 @@ export default function Dashboard() {
             </div>
 
             {activeTab === 'calculadora' ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-
-                  if (JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)) return
-
-                  const newErrors = validateCalculatorForm(formValues)
-
-                  if (Object.keys(newErrors).length > 0) {
-                    setErrors(newErrors)
-                    return
-                  }
-
-                  setErrors({})
-                  setLastSubmittedValues({ ...formValues })
-                  handleLocalCalculate()
-                }}
-                className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'>
-                {[
-                  { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
-                  { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
-                  {
-                    label: 'Porcentaje Broker (%)',
-                    name: 'porcentajeGanancia',
-                    placeholder: 'Ej: 80',
-                    max: '99',
-                    min: '50'
-                  },
-
-                  { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
-                ].map((field) => (
-                  <div key={field.name} className='space-y-1'>
-                    <div className='flex justify-between items-center'>
-                      <label className='text-[15px] text-slate-300 font-semibold'>{field.label}</label>
-
-                      {errors[field.name] && (
-                        <span className='text-[11px] text-rose-400 font-bold animate-pulse'>{errors[field.name]}</span>
-                      )}
-                    </div>
-
-                    <input
-                      name={field.name}
-                      type='number'
-                      step='any'
-                      min={field.min}
-                      max={field.max}
-                      required
-                      value={formValues[field.name]}
-                      onChange={(e) => {
-                        if (errors[field.name]) setErrors({ ...errors, [field.name]: null })
-
-                        handleChange(e)
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
-                      }}
-                      className={`w-full bg-[#0d1117] border ${
-                        errors[field.name] ? 'border-rose-500/50' : 'border-slate-700'
-                      } rounded-lg p-2 focus:border-cyan-500 outline-none text-white font-mono transition-colors`}
-                      placeholder='0.00'
-                    />
-                  </div>
-                ))}
-
-                <button
-                  type='submit'
-                  disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
-                  className='w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl mt-4 disabled:opacity-40 transition-all active:scale-[0.98]'>
-                  {loading ? 'Procesando...' : 'Calcular'}
-                </button>
-              </form>
+              <CalculatorForm
+                formValues={formValues}
+                errors={errors}
+                onFieldChange={handleFieldChange}
+                onSubmit={handleCalculatorSubmit}
+                loading={loading}
+                lastSubmittedValues={lastSubmittedValues}
+              />
             ) : (
               <form
                 onSubmit={handleGuardarSesion}
