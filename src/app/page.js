@@ -125,6 +125,20 @@ export default function Dashboard() {
     setBitacoraForm({ fecha: hoyStr, horaInicio: '', horaFin: '', saldoInicial: '', saldoFinal: '', notas: '' })
   }
 
+  // --- NUEVOS MANEJADORES PARA HISTORIAL DE SESIONES ---
+
+  const handleDeleteSesion = (id) => {
+    setSesiones((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  const handleDeleteManySesiones = (ids) => {
+    setSesiones((prev) => prev.filter((s) => !ids.includes(s.id)))
+  }
+
+  const handleUpdateSesionNotes = (id, notas) => {
+    setSesiones((prev) => prev.map((s) => (s.id === id ? { ...s, notas } : s)))
+  }
+
   const copyToClipboard = async (value, index) => {
     await copyToClipboardUtil(value)
     setCopiedIndex(index)
@@ -258,17 +272,17 @@ export default function Dashboard() {
 
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none font-semibold'>
               {[
                 {
-                  label: 'Hoy',
+                  label: 'Gan/Per Hoy',
                   val: pnlHoy,
-                  color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-400' : 'text-rose-300',
+                  color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-200' : 'text-rose-300',
                   prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '$'
                 },
 
                 {
-                  label: 'Histórico',
+                  label: 'Gan/Per Gral.',
                   val: pnlTotal,
                   color: parseFloat(pnlTotal) >= 0 ? 'text-cyan-400' : 'text-rose-400',
                   prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '$'
@@ -277,7 +291,7 @@ export default function Dashboard() {
                 { label: 'Sesiones hoy', val: sesionesHoy.length, color: 'text-blue-400', prefix: '' }
               ].map((card, i) => (
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
-                  <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
+                  <p className='text-[12px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
 
                   <p className={`text-sm md:text-base font-mono font-semibold ${card.color}`}>
                     {card.prefix}
@@ -287,10 +301,10 @@ export default function Dashboard() {
               ))}
 
               <div className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
-                <p className='text-[14px] text-slate-300 font-semibold tracking-wider mb-1'>Saldo</p>
+                <p className='text-[12px] text-slate-300 font-semibold tracking-wider mb-1'>Saldo actual</p>
 
-                <div className='flex items-center justify-center gap-1'>
-                  <span className='text-xs text-white'>$</span>
+                <div className='flex items-center justify-center gap-0'>
+                  <span className='text-xs text-emerald-400'>$</span>
 
                   <input
                     type='number'
@@ -301,7 +315,7 @@ export default function Dashboard() {
                       if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
                     }}
                     style={{ width: `${Math.max(4, (saldoGlobal || '').toString().length + 2)}ch` }}
-                    className='bg-transparent font-mono text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
+                    className='bg-transparent font-mono font-semibold text-sm md:text-base text-emerald-400 outline-none focus:border-b border-cyan-500 text-center transition-all'
                   />
                 </div>
               </div>
@@ -353,7 +367,12 @@ export default function Dashboard() {
               </div>
             )
           ) : (
-            <SessionsHistory sesiones={sesiones} />
+            <SessionsHistory
+              sesiones={sesiones}
+              onDelete={handleDeleteSesion}
+              onDeleteMany={handleDeleteManySesiones}
+              onUpdateNotes={handleUpdateSesionNotes}
+            />
           )}
         </main>
 
