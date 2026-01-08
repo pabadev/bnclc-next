@@ -33,10 +33,10 @@ export default function Dashboard() {
   const [lastSubmittedValues, setLastSubmittedValues] = useState({})
   const [activeTab, setActiveTab] = useState('calculadora')
 
-  const hoyStr = getFechaLocal()
+  const [hoyStr, setHoyStr] = useState('')
 
   const [bitacoraForm, setBitacoraForm] = useState({
-    fecha: hoyStr,
+    fecha: '',
     horaInicio: '',
     horaFin: '',
     saldoInicial: '',
@@ -137,6 +137,57 @@ export default function Dashboard() {
 
   const pnlTotal = sesiones.reduce((acc, s) => acc + parseFloat(s.pnl), 0).toFixed(2)
 
+  // --- MONTAJE E HIDRATACIÓN: cargar desde localStorage sólo en cliente ---
+  useEffect(() => {
+    setIsMounted(true)
+
+    const hoy = getFechaLocal()
+    setHoyStr(hoy)
+
+    try {
+      const savedSesiones = localStorage.getItem('binacalc_sesiones')
+      const savedSaldo = localStorage.getItem('binacalc_saldo_global')
+
+      if (savedSesiones) setSesiones(JSON.parse(savedSesiones))
+      if (savedSaldo) setSaldoGlobal(savedSaldo)
+    } catch (err) {
+      console.warn('No se pudo acceder a localStorage:', err)
+    }
+
+    setBitacoraForm((prev) => ({ ...prev, fecha: hoy }))
+  }, [])
+
+  // Persistir sesiones en localStorage cuando cambian (y sólo en cliente)
+  useEffect(() => {
+    if (!isMounted) return
+    try {
+      localStorage.setItem('binacalc_sesiones', JSON.stringify(sesiones))
+    } catch (err) {
+      console.warn('Error guardando sesiones en localStorage:', err)
+    }
+  }, [sesiones, isMounted])
+
+  // Persistir saldoGlobal en localStorage
+  useEffect(() => {
+    if (!isMounted) return
+    try {
+      localStorage.setItem('binacalc_saldo_global', saldoGlobal)
+    } catch (err) {
+      console.warn('Error guardando saldoGlobal en localStorage:', err)
+    }
+  }, [saldoGlobal, isMounted])
+
+  // Efecto visual al recibir resultados
+  useEffect(() => {
+    if (result) {
+      setIsPulsing(true)
+      const timer = setTimeout(() => setIsPulsing(false), 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [result])
+
+  if (!isMounted) return <div className='min-h-screen bg-[#0a0f18]' />
+
   return (
     <div
       className='min-h-screen lg:h-screen flex flex-col bg-[#0a0f18] text-slate-200 font-sans lg:overflow-hidden'
@@ -207,7 +258,7 @@ export default function Dashboard() {
 
         <main className='lg:col-span-6 flex flex-col h-full min-h-0 space-y-4'>
           {activeTab === 'bitacora' && (
-            <div className='font-semibold grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-3 flex-none'>
               {[
                 {
                   label: 'Hoy',
@@ -250,7 +301,7 @@ export default function Dashboard() {
                       if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
                     }}
                     style={{ width: `${Math.max(4, (saldoGlobal || '').toString().length + 2)}ch` }}
-                    className='bg-transparent font-mono font-semibold text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
+                    className='bg-transparent font-mono text-sm md:text-base text-white outline-none focus:border-b border-cyan-500 text-center transition-all'
                   />
                 </div>
               </div>
