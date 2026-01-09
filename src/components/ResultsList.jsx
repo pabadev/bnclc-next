@@ -74,12 +74,18 @@ export default function ResultsList({ resultados, copiedIndex, onCopy }) {
           <div className='flex gap-0 md:gap-3'>
             <div className='text-right'>
               <p className='text-[11px] text-slate-300 font-semibold'>Ganancia</p>
-              <p className='font-mono text-[12px] md:text-base text-emerald-500'>{op.ganancia}</p>
+              <p className='flex font-mono justify-end text-[12px] md:text-lg text-emerald-500'>
+                <span className='hidden md:block'>$</span>
+                {op.ganancia}
+              </p>
             </div>
 
             <div className='text-right pl-2 md:pl-4'>
-              <p className='text-[11px] text-slate-300 font-semibold min-w-[75px] md:min-w-[120px]'>Acumulado</p>
-              <p className='font-mono text-[12px] md:text-base text-blue-500'>{op.acumulado}</p>
+              <p className='text-[11px] text-slate-300 font-semibold min-w-[70px] md:min-w-[120px]'>Requerido</p>
+              <p className='flex font-mono justify-end text-[12px] md:text-lg text-blue-500'>
+                <span className='hidden md:block'>$</span>
+                {op.acumulado}
+              </p>
             </div>
           </div>
         </div>
