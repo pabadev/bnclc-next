@@ -6,7 +6,7 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
   if (!isOpen) return null
 
   return (
-    <div className='absolute top-full left-0 w-full bg-[#0d1117] border-b border-slate-800 flex flex-col p-4 gap-4 md:hidden shadow-2xl'>
+    <div className='absolute top-full right-0 w-64 bg-[#0d1117] border-b border-slate-600 flex flex-col p-4 gap-4 lg:hidden shadow-2xl'>
       <a href='#' className='text-lg font-medium text-slate-300'>
         Blog
       </a>
