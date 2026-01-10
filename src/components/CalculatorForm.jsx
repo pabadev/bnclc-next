@@ -47,7 +47,7 @@ export default function CalculatorForm({ formValues, errors, onFieldChange, onSu
       <button
         type='submit'
         disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
-        className='w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl mt-4 disabled:opacity-40 transition-all active:scale-[0.98]'>
+        className='w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl mt-4 disabled:opacity-40 transition-all active:scale-[0.95]'>
         {loading ? 'Procesando...' : 'Calcular'}
       </button>
     </form>

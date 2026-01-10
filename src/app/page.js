@@ -224,7 +224,7 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab(activeTab === 'calculadora' ? 'bitacora' : 'calculadora')}
-                className='bg-[#0d1117] border border-emerald-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
+                className='active:scale-95 bg-[#0d1117] border border-emerald-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
                 <div className='flex items-center gap-1.5 px-2 py-0.5'>
                   <span
                     className={`text-[10px] font-bold ${

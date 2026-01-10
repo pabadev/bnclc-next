@@ -163,7 +163,7 @@ export default function Header() {
                         </svg>
                       </div>
                       <div>
-                        <p className='text-sm text-white font-bold'>Calendario Económico</p>
+                        <p className='text-sm text-white font-semibold'>Calendario Económico</p>
                         <p className='text-[10px] text-slate-500'>Evita noticias volátiles</p>
                       </div>
                     </Link>
@@ -191,7 +191,7 @@ export default function Header() {
                         </svg>
                       </div>
                       <div>
-                        <p className='text-sm text-white font-bold'>Sesiones de Mercado</p>
+                        <p className='text-sm text-white font-semibold'>Sesiones de Mercado</p>
                         <p className='text-[10px] text-slate-500'>Londres / NY / Tokio</p>
                       </div>
                     </Link>
