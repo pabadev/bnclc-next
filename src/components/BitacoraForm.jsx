@@ -91,7 +91,7 @@ export default function BitacoraForm({ bitacoraForm, onChange, onSubmit, hoyStr 
 
       <button
         type='submit'
-        className='w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl mt-4 text-sm transition-colors shadow-lg active:scale-[0.98]'>
+        className='w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3 rounded-xl mt-4 text-sm transition-colors shadow-lg active:scale-[0.98]'>
         Guardar Sesión
       </button>
     </form>
