@@ -1,18 +1,108 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
+import { useDropdown } from '@/hooks/useDropdown'
 
 export default function MobileMenu({ isOpen, setIsOpen }) {
+  const tools = useDropdown()
+  const toolsRef = useRef(null)
+  const menuRef = useRef(null)
+
+  /* ─────────────────────────────
+     Cerrar menú móvil al click fuera
+  ───────────────────────────── */
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        tools.setOpen(false)
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen, setIsOpen, tools])
+
+  /* ─────────────────────────────
+     Teclado submenu herramientas
+  ───────────────────────────── */
+  useEffect(() => {
+    if (!tools.open || !toolsRef.current) return
+
+    const items = toolsRef.current.querySelectorAll('[role="menuitem"]')
+    if (!items.length) return
+
+    let index = 0
+    items[0].focus()
+
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case 'Escape':
+          tools.setOpen(false)
+          toolsRef.current.querySelector('button')?.focus()
+          break
+
+        case 'ArrowDown':
+          e.preventDefault()
+          index = (index + 1) % items.length
+          items[index].focus()
+          break
+
+        case 'ArrowUp':
+          e.preventDefault()
+          index = (index - 1 + items.length) % items.length
+          items[index].focus()
+          break
+
+        default:
+          break
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [tools.open, tools])
+
   if (!isOpen) return null
 
   return (
-    <div className='absolute top-full right-0 w-64 bg-[#0d1117] border-b border-slate-600 flex flex-col p-4 gap-4 lg:hidden shadow-2xl'>
-      <a href='#' className='text-lg font-medium text-slate-300'>
+    <nav
+      ref={menuRef}
+      role='navigation'
+      aria-label='Menú principal móvil'
+      className='
+        absolute top-full right-2 mt-2
+        w-[76%] max-w-xs
+        bg-[#0d1117]
+        border border-slate-800
+        rounded-2xl
+        shadow-2xl
+        p-4
+        flex flex-col gap-4
+        lg:hidden
+        transition-all duration-200 ease-out
+      '>
+      {/* Item */}
+      <a href='#' className='text-base font-medium text-slate-300 hover:text-cyan-400 transition-colors'>
         Blog
       </a>
 
-      <div className='relative group/menu'>
-        <button className='flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors'>
+      {/* Herramientas */}
+      <div ref={toolsRef} className='flex flex-col'>
+        <button
+          type='button'
+          onClick={tools.toggleMenu}
+          aria-haspopup='menu'
+          aria-expanded={tools.open}
+          aria-controls='mobile-tools-menu'
+          className='
+            flex items-center justify-between
+            text-base font-medium text-slate-300
+            hover:text-cyan-400 transition-colors
+          '>
           Herramientas
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -22,14 +112,44 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
             fill='none'
             stroke='currentColor'
             strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'>
+            className={`transition-transform ${tools.open ? 'rotate-180' : ''}`}>
             <path d='m6 9 6 6 6-6' />
           </svg>
         </button>
 
-        <div className='absolute top-full left-0 mt-2 w-56 bg-[#161b26] border border-slate-800 rounded-xl shadow-2xl py-3 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-200 z-[70]'>
-          <a href='#' className='flex items-center gap-3 px-4 py-2 hover:bg-slate-800 transition-colors'>
+        {/* Submenu */}
+        <div
+          id='mobile-tools-menu'
+          role='menu'
+          aria-hidden={!tools.open}
+          className={`
+            mt-2
+            bg-[#161b26]
+            border border-slate-800
+            rounded-xl
+            shadow-xl
+            overflow-hidden
+            transition-all duration-200 ease-out
+            ${
+              tools.open
+                ? 'opacity-100 scale-100 translate-y-0 py-2'
+                : 'opacity-0 scale-[0.98] -translate-y-1 py-0 h-0 border-transparent'
+            }
+          `}>
+          {/* Item */}
+          <Link
+            href='#'
+            role='menuitem'
+            tabIndex={tools.open ? 0 : -1}
+            onClick={() => {
+              tools.setOpen(false)
+              setIsOpen(false)
+            }}
+            className='
+              mx-2 rounded-lg
+              flex items-center gap-3 px-3 py-2
+              hover:bg-[#0d1117] transition-colors
+            '>
             <div className='p-1.5 bg-amber-500/10 rounded-lg text-amber-500'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -46,12 +166,25 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
               </svg>
             </div>
             <div>
-              <p className='text-sm text-white font-bold'>Calendario Económico</p>
+              <p className='text-sm text-white font-semibold'>Calendario Económico</p>
               <p className='text-[10px] text-slate-500'>Evita noticias volátiles</p>
             </div>
-          </a>
+          </Link>
 
-          <a href='#' className='flex items-center gap-3 px-4 py-2 hover:bg-slate-800 transition-colors'>
+          {/* Item */}
+          <Link
+            href='#'
+            role='menuitem'
+            tabIndex={tools.open ? 0 : -1}
+            onClick={() => {
+              tools.setOpen(false)
+              setIsOpen(false)
+            }}
+            className='
+              mx-2 rounded-lg
+              flex items-center gap-3 px-3 py-2
+              hover:bg-[#0d1117] transition-colors
+            '>
             <div className='p-1.5 bg-cyan-500/10 rounded-lg text-cyan-500'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -66,22 +199,24 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
               </svg>
             </div>
             <div>
-              <p className='text-sm text-white font-bold'>Sesiones de Mercado</p>
+              <p className='text-sm text-white font-semibold'>Sesiones de Mercado</p>
               <p className='text-[10px] text-slate-500'>Londres / NY / Tokio</p>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 
-      <a href='#' className='text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors'>
+      <a href='#' className='text-base font-medium text-slate-300 hover:text-cyan-400 transition-colors'>
         Telegram
       </a>
-      <a href='#' className='text-lg font-medium text-slate-300'>
+
+      <a href='#' className='text-base font-medium text-slate-300'>
         Ingresar
       </a>
-      <a href='#' className='text-lg font-medium text-blue-400'>
+
+      <a href='#' className='text-base font-medium text-blue-400'>
         Registrarse
       </a>
-    </div>
+    </nav>
   )
 }
