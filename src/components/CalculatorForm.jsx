@@ -1,23 +1,30 @@
 'use client'
 
 export default function CalculatorForm({ formValues, errors, onFieldChange, onSubmit, loading, lastSubmittedValues }) {
+  const fields = [
+    { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
+    { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
+    {
+      label: 'Porcentaje Broker (%)',
+      name: 'porcentajeGanancia',
+      placeholder: 'Ej: 80',
+      min: '50',
+      max: '99'
+    },
+    { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
+  ]
+
+  const hasEmptyFields = Object.values(formValues).some((v) => v === '')
+  const isSameAsLast = JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)
+
+  const isDisabled = loading || hasEmptyFields || isSameAsLast
+
   return (
     <form
       onSubmit={onSubmit}
       className='flex-1 flex flex-col gap-3 lg:overflow-y-auto pr-1 custom-scrollbar'
       noValidate>
-      {[
-        { label: 'Saldo Actual', name: 'saldoActual', min: '1' },
-        { label: 'Inversión Inicial', name: 'inversionInicial', min: '1' },
-        {
-          label: 'Porcentaje Broker (%)',
-          name: 'porcentajeGanancia',
-          placeholder: 'Ej: 80',
-          max: '99',
-          min: '50'
-        },
-        { label: 'Ganancia Esperada', name: 'gananciaEsperada', min: '0' }
-      ].map((field) => {
+      {fields.map((field) => {
         const hasError = Boolean(errors[field.name])
         const errorId = `${field.name}-error`
 
@@ -63,8 +70,8 @@ export default function CalculatorForm({ formValues, errors, onFieldChange, onSu
 
       <button
         type='submit'
-        disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
-        aria-disabled={loading || JSON.stringify(formValues) === JSON.stringify(lastSubmittedValues)}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
         className='w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl mt-4 disabled:opacity-40 transition-all active:scale-[0.95]'>
         {loading ? 'Procesando...' : 'Calcular'}
       </button>
