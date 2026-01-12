@@ -22,8 +22,8 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
   }, [isOpen, setIsOpen, tools])
 
   /* ─────────────────────────────
@@ -74,8 +74,8 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
       role='navigation'
       aria-label='Menú principal móvil'
       className='
-        absolute top-full right-2 mt-2
-        w-[76%] max-w-xs
+        absolute top-full right-4 mt-2
+        maxw-64
         bg-[#0d1117]
         border border-slate-800
         rounded-2xl
@@ -123,7 +123,6 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
           role='menu'
           aria-hidden={!tools.open}
           className={`
-            mt-2
             bg-[#161b26]
             border border-slate-800
             rounded-xl
@@ -132,7 +131,7 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
             transition-all duration-200 ease-out
             ${
               tools.open
-                ? 'opacity-100 scale-100 translate-y-0 py-2'
+                ? 'mt-2 opacity-100 scale-100 translate-y-0 py-2'
                 : 'opacity-0 scale-[0.98] -translate-y-1 py-0 h-0 border-transparent'
             }
           `}>

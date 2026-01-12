@@ -72,7 +72,7 @@ export default function Header() {
 
   return (
     <header className='flex-none border-b border-slate-800 bg-[#0a0f18] relative z-50' role='banner'>
-      <div className='max-w-[1600px] mx-auto h-16 flex items-center justify-between px-2 md:px-4'>
+      <div className=' max-w-2xl lg:max-w-[1600px] mx-auto h-16 flex items-center justify-between px-4 md:px-4'>
         {/* LOGO */}
         <Link
           href='/'
@@ -88,9 +88,9 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* NAV */}
-        <div className='flex items-end gap-3 md:gap-6'>
-          <div className='flex items-center gap-3 md:gap-6'>
+        <div className='flex items-end'>
+          <div className='flex items-center gap-5 md:gap-6'>
+            {/* NAV */}
             <nav className='hidden lg:flex items-center gap-6' role='navigation' aria-label='Navegación principal'>
               <a href='#' className='text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors'>
                 Blog
@@ -254,7 +254,7 @@ export default function Header() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label='Abrir menú'
               aria-expanded={isMenuOpen}
-              className='lg:hidden p-2 text-slate-400'>
+              className='lg:hidden text-slate-400'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 width='24'
