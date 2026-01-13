@@ -13,7 +13,7 @@ export default function ResultsList({ resultados, copiedIndex, onCopy }) {
             </div>
 
             <div>
-              <p className='text-[12px] text-slate-300 font-semibold mb-0.5'>Monto Inv.</p>
+              <p className='text-[12px] text-slate-300 font-semibold'>Monto Inv.</p>
               <div className='flex items-center gap-0.5 md:gap-2'>
                 <p className='font-mono text-[15px] md:text-lg text-blue-300'>${op.inversion}</p>
 

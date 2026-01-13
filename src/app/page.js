@@ -11,6 +11,7 @@ import { calcularInversionesLocal } from '@/lib/localCalculations'
 import { getFechaLocal, copyToClipboard as copyToClipboardUtil } from '@/lib/pageUtils'
 import { validateCalculatorForm } from '@/lib/validators'
 import { saveSesion } from '@/lib/bitacora'
+import ViewToggle from '@/components/ViewToggle'
 
 export default function Dashboard() {
   // --- LÓGICA DE FECHA LOCAL ---
@@ -47,6 +48,8 @@ export default function Dashboard() {
   const [sesiones, setSesiones] = useState([])
   const [saldoGlobal, setSaldoGlobal] = useState('')
   const [copiedIndex, setCopiedIndex] = useState(null)
+  const [sessionsView, setSessionsView] = useState('list') // 'list' | 'calendar'
+
   // --- TU LÓGICA ORIGINAL DE CALCULATION.JS (FRONTEND) ---
 
   const handleLocalCalculate = () => {
@@ -222,30 +225,14 @@ export default function Dashboard() {
                 {activeTab === 'calculadora' ? 'Calculadora' : 'Bitácora de sesiones'}
               </h2>
 
-              <button
-                onClick={() => setActiveTab(activeTab === 'calculadora' ? 'bitacora' : 'calculadora')}
-                className='active:scale-95 bg-[#0d1117] border border-emerald-700 p-1 rounded-lg hover:border-cyan-500 transition-colors'>
-                <div className='flex items-center gap-1.5 px-2 py-0.5'>
-                  <span
-                    className={`text-[10px] font-bold ${
-                      activeTab === 'calculadora' ? 'text-cyan-400' : 'text-slate-500'
-                    }`}>
-                    Calc
-                  </span>
-                  <div className='w-4 h-2 bg-slate-700 rounded-full relative'>
-                    <div
-                      className={`absolute top-0 w-2 h-2 bg-cyan-500 rounded-full transition-all ${
-                        activeTab === 'calculadora' ? 'left-0' : 'left-2'
-                      }`}></div>
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold ${
-                      activeTab === 'bitacora' ? 'text-emerald-400' : 'text-slate-500'
-                    }`}>
-                    Bit
-                  </span>
-                </div>
-              </button>
+              <ViewToggle
+                options={[
+                  { value: 'calculadora', label: 'Calc' },
+                  { value: 'bitacora', label: 'Bit' }
+                ]}
+                value={activeTab}
+                onChange={setActiveTab}
+              />
             </div>
 
             {activeTab === 'calculadora' ? (
@@ -362,7 +349,7 @@ export default function Dashboard() {
                 <ResultsList resultados={result.resultados} copiedIndex={copiedIndex} onCopy={copyToClipboard} />
               </>
             ) : (
-              <div className='flex-1 border-2 border-dashed border-slate-800 rounded-3xl flex items-center justify-center text-slate-600 text-center px-6 min-h-[200px]'>
+              <div className='flex flex-1 border-2 border-dashed border-slate-800 rounded-3xl flex items-center justify-center text-slate-600 text-center px-6 min-h-[200px]'>
                 Ingresa los parámetros para ver la secuencia
               </div>
             )
@@ -372,6 +359,8 @@ export default function Dashboard() {
               onDelete={handleDeleteSesion}
               onDeleteMany={handleDeleteManySesiones}
               onUpdateNotes={handleUpdateSesionNotes}
+              viewMode={sessionsView}
+              onChangeView={setSessionsView}
             />
           )}
         </main>
