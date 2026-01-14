@@ -85,6 +85,27 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
     console.log(value)
   }
 
+  // Formatea a fecha larga o corta según si es pantalla movil o no
+  const formatSessionDateShort = (dateStr) => {
+    const shortDate = dateStr.split('-').reverse().join('-')
+    return shortDate
+  }
+
+  const formatSessionDateLong = (dateStr) => {
+    // desktop → fecha larga
+    const [y, m, d] = dateStr.split('-').map(Number)
+    const localDate = new Date(y, m - 1, d)
+
+    const formatted = localDate.toLocaleDateString('es-CO', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+    const longDate = formatted.charAt(0).toUpperCase() + formatted.slice(1)
+    return longDate
+  }
+
   return (
     <>
       <div className='relative flex-1 bg-[#161b26] rounded-2xl border border-slate-800 p-4 flex flex-col min-h-0 shadow-xl'>
@@ -130,14 +151,17 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
                           checked={selected.includes(ses.id)}
                           onChange={() => toggleSelect(ses.id)}
                         />
-                        <span className='text-[12px] text-slate-200 font-semibold'>
-                          {ses.fecha.split('-').reverse().join('-')} | {ses.horaInicio} a {ses.horaFin}
+                        <span className='md:hidden text-[12px] text-slate-200 font-base'>
+                          {formatSessionDateShort(ses.fecha)}| {ses.horaInicio} a {ses.horaFin}
+                        </span>
+                        <span className='hidden md:block text-[12px] text-slate-200 font-base'>
+                          {formatSessionDateLong(ses.fecha)}| {ses.horaInicio} a {ses.horaFin}
                         </span>
                       </div>
 
                       <span
                         className={`text-[15px] font-mono ${
-                          parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-800'
+                          parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-400'
                         }`}>
                         ({parseFloat(ses.pnl) >= 0 ? '+' : ''}
                         {ses.pnl})

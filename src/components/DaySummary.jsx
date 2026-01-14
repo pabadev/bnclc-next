@@ -3,7 +3,7 @@
 export default function DaySummary({ date, sessions }) {
   if (!sessions || sessions.length === 0) return null
 
-  // 1. Función para convertir "09:26 p. m." a minutos totales del día
+  // ───── Utils ─────
   const toMinutes = (timeStr) => {
     const match = timeStr.match(/(\d+):(\d+)\s*([ap])/i)
     if (!match) return 0
@@ -15,23 +15,30 @@ export default function DaySummary({ date, sessions }) {
     return h * 60 + m
   }
 
-  // 2. Ordenamos de forma DESCENDENTE (más tarde arriba)
+  const sessionDuration = (start, end) => {
+    const diff = toMinutes(end) - toMinutes(start)
+    if (diff <= 0) return null
+    const h = Math.floor(diff / 60)
+    const m = diff % 60
+    return h > 0 ? `${h}h ${m}m` : `${m}m`
+  }
+
+  const formatMoney = (n) => `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+
+  // ───── Orden ─────
   const ordered = [...sessions].sort((a, b) => toMinutes(b.horaInicio) - toMinutes(a.horaInicio))
 
-  // 3. Para los cálculos de balance, necesitamos el primero y último cronológicamente
-  // Como 'ordered' está al revés, el primero del día es el último del array y viceversa
   const firstSession = ordered[ordered.length - 1]
   const lastSession = ordered[0]
 
   const totalPnL = ordered.reduce((acc, s) => acc + parseFloat(s.pnl), 0)
   const firstSaldo = parseFloat(firstSession.saldoInicial)
   const lastSaldo = parseFloat(lastSession.saldoFinal)
-  const balanceDiff = lastSaldo - firstSaldo
 
-  const dayResult = totalPnL > 0 ? 'Día positivo' : totalPnL < 0 ? 'Día negativo' : 'Break-even'
+  const dayIsPositive = totalPnL > 0
+  const dayIsNegative = totalPnL < 0
 
-  const formatMoney = (n) => `${n >= 0 ? '+' : ''}$${n.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-
+  // ───── Fecha larga ─────
   const [y, m, d] = date.split('-').map(Number)
   const localDate = new Date(y, m - 1, d)
 
@@ -42,7 +49,6 @@ export default function DaySummary({ date, sessions }) {
     year: 'numeric'
   })
 
-  // Capitalizar primera letra
   const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
 
   return (
@@ -52,38 +58,61 @@ export default function DaySummary({ date, sessions }) {
 
       {/* ───── Summary cards ───── */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-xs'>
-        <SummaryCard label='Sesiones'>{sessions.length}</SummaryCard>
+        <SummaryCard label='Sesiones'>
+          <div className='flex items-center justify-center gap-2'>
+            <span>{sessions.length}</span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                dayIsPositive ? 'bg-emerald-400' : dayIsNegative ? 'bg-rose-400' : 'bg-slate-400'
+              }`}
+            />
+          </div>
+        </SummaryCard>
 
-        <SummaryCard label='PnL del día' valueClass={totalPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+        <SummaryCard label='Gan/Per' valueClass={totalPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+          {totalPnL >= 0 ? '+' : ''}
           {formatMoney(totalPnL)}
         </SummaryCard>
 
-        <SummaryCard
-          label='Resultado'
-          valueClass={totalPnL > 0 ? 'text-emerald-400' : totalPnL < 0 ? 'text-rose-400' : 'text-slate-400'}>
-          {dayResult}
-        </SummaryCard>
+        <SummaryCard label='Saldo inicial'>{formatMoney(firstSaldo)}</SummaryCard>
 
-        <SummaryCard label='Balance' valueClass={balanceDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-          {formatMoney(balanceDiff)}
+        <SummaryCard label='Saldo final' valueClass={lastSaldo >= firstSaldo ? 'text-emerald-200' : 'text-rose-200'}>
+          {formatMoney(lastSaldo)}
         </SummaryCard>
       </div>
 
-      {/* ───── Sessions list (Orden descendente) ───── */}
+      {/* ───── Sessions list ───── */}
       <div className='space-y-2'>
-        {ordered.map((s) => (
-          <div
-            key={s.id}
-            className='flex justify-between items-center text-xs bg-[#161b26] border border-slate-800 rounded-lg px-3 py-2'>
-            <span className='text-slate-400'>
-              {s.horaInicio} – {s.horaFin}
-            </span>
+        {ordered.map((s) => {
+          const pnl = parseFloat(s.pnl)
+          const saldoIni = parseFloat(s.saldoInicial)
+          const saldoFin = parseFloat(s.saldoFinal)
+          const duration = sessionDuration(s.horaInicio, s.horaFin)
 
-            <span className={`font-mono ${parseFloat(s.pnl) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {formatMoney(parseFloat(s.pnl))}
-            </span>
-          </div>
-        ))}
+          return (
+            <div key={s.id} className='bg-[#161b26] border border-slate-800 rounded-lg px-3 py-2 text-xs space-y-1'>
+              {/* Fila superior */}
+              <div className='flex justify-between items-center'>
+                <span className='text-slate-400'>
+                  {s.horaInicio} – {s.horaFin}
+                </span>
+
+                <span className={`font-mono ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {pnl >= 0 ? '+' : ''}
+                  {formatMoney(pnl)}
+                </span>
+              </div>
+
+              {/* Fila inferior */}
+              <div className='flex justify-between text-[10px] text-slate-500'>
+                <span>
+                  {formatMoney(saldoIni)} → {formatMoney(saldoFin)}
+                </span>
+                {duration && <span>{duration}</span>}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
