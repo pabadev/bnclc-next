@@ -32,10 +32,23 @@ export default function DaySummary({ date, sessions }) {
 
   const formatMoney = (n) => `${n >= 0 ? '+' : ''}$${n.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
 
+  const [y, m, d] = date.split('-').map(Number)
+  const localDate = new Date(y, m - 1, d)
+
+  const formattedDate = localDate.toLocaleDateString('es-CO', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+
+  // Capitalizar primera letra
+  const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
+
   return (
     <div className='bg-[#0d1117] border border-slate-800 rounded-2xl p-4 space-y-4'>
       {/* ───── Header ───── */}
-      <div className='text-center text-xs text-slate-400 tracking-widest'>{date.split('-').reverse().join('-')}</div>
+      <div className='text-center text-xs text-slate-400 tracking-widest'>{capitalizedDate}</div>
 
       {/* ───── Summary cards ───── */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-xs'>
