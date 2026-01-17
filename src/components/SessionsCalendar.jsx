@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import DaySummary from './DaySummary'
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 
 export default function SessionsCalendar({ sesiones }) {
   const groupedByDate = useMemo(() => {
@@ -13,44 +14,67 @@ export default function SessionsCalendar({ sesiones }) {
   }, [sesiones])
 
   const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
 
-  const firstDay = new Date(year, month, 1).getDay()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  // ───── Estado de mes/año visible ─────
+  const [currentYear, setCurrentYear] = useState(today.getFullYear())
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth()) // 0-11
+
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay()
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
 
   const cells = []
-
   const [selectedDate, setSelectedDate] = useState(null)
 
   for (let i = 0; i < firstDay; i++) cells.push(null)
   for (let d = 1; d <= daysInMonth; d++) cells.push(d)
 
-  // Función para convertir "10:31 p. m." a minutos totales (0-1440)
-  const parseTimeToMinutes = (timeStr) => {
-    if (!timeStr) return 0
+  // ───── Navegación de meses ─────
+  // ───── Navegación de meses (FIX DEFINITIVO) ─────
+  const goPrevMonth = () => {
+    setSelectedDate(null)
 
-    // Extraemos los números y el periodo (a o p)
-    const match = timeStr.match(/(\d+):(\d+)\s*([ap])/i)
-    if (!match) return 0
-
-    let [, hours, minutes, period] = match
-    hours = parseInt(hours, 10)
-    minutes = parseInt(minutes, 10)
-    const isPM = period.toLowerCase() === 'p'
-
-    // Ajuste para formato 24 horas
-    if (isPM && hours !== 12) hours += 12
-    if (!isPM && hours === 12) hours = 0
-
-    return hours * 60 + minutes
+    const newDate = new Date(currentYear, currentMonth - 1, 1)
+    setCurrentYear(newDate.getFullYear())
+    setCurrentMonth(newDate.getMonth())
   }
+
+  const goNextMonth = () => {
+    setSelectedDate(null)
+
+    const newDate = new Date(currentYear, currentMonth + 1, 1)
+    setCurrentYear(newDate.getFullYear())
+    setCurrentMonth(newDate.getMonth())
+  }
+
+  const monthLabel = new Date(currentYear, currentMonth).toLocaleDateString('es-CO', {
+    month: 'long',
+    year: 'numeric'
+  })
+
+  const capitalizedMonth = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)
 
   return (
     <>
+      {/* ───── Header mes / año ───── */}
+      <div className='flex items-center justify-between mb-3 text-xs text-slate-200'>
+        <div
+          onClick={goPrevMonth}
+          className='px-3 py-1 rounded-md cursor-pointer hover:bg-slate-800 hover:text-cyan-400'>
+          <ChevronLeftIcon size={16} />
+        </div>
+
+        <span className='uppercase tracking-widest'>{capitalizedMonth}</span>
+
+        <div
+          onClick={goNextMonth}
+          className='px-3 py-1 rounded-md cursor-pointer hover:bg-slate-800 hover:text-cyan-400'>
+          <ChevronRightIcon size={16} />
+        </div>
+      </div>
+
       <div className='grid grid-cols-7 gap-2 text-xs'>
-        {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, index) => (
-          <div key={`${d}-${index}`} className='text-center text-slate-500 font-semibold'>
+        {['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA'].map((d, index) => (
+          <div key={`${d}-${index}`} className='text-center text-slate-400 font-semibold'>
             {d}
           </div>
         ))}
@@ -58,7 +82,7 @@ export default function SessionsCalendar({ sesiones }) {
         {cells.map((day, i) => {
           if (!day) return <div key={i} />
 
-          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
           const hasSessions = groupedByDate[dateStr]
           const isSelected = selectedDate === dateStr
 

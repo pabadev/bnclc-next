@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import ViewToggle from '@/components/ViewToggle'
 import SessionsCalendar from '@/components/SessionsCalendar'
+import { EditIcon, DeleteIcon, SaveIcon, CheckIcon } from '@/components/icons'
 
 export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onDeleteMany }) {
   const [editingId, setEditingId] = useState(null)
@@ -143,6 +144,7 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
                 return (
                   <div
                     key={ses.id}
+                    id={`session-${ses.id}`}
                     className='bg-[#0d1117] px-5 py-2 rounded-xl border border-slate-800 flex flex-col gap-2'>
                     <div className='flex justify-between items-center'>
                       <div className='flex items-center gap-2'>
@@ -163,49 +165,26 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
                         className={`text-[15px] font-mono ${
                           parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-400'
                         }`}>
-                        ({parseFloat(ses.pnl) >= 0 ? '+' : ''}
-                        {ses.pnl})
+                        {parseFloat(ses.pnl) >= 0 ? '+$' : '-$'}
+                        {ses.pnl >= 0 ? ses.pnl : ses.pnl.slice(1)}
                       </span>
                     </div>
 
                     <div className='flex items-center gap-4 text-[11px] text-slate-300 border-t border-slate-800/50 pt-1'>
-                      <span>Inicial: ${ses.saldoInicial}</span>
-                      <span>Final: ${ses.saldoFinal}</span>
+                      <span className='flex md:hidden'>inicial: ${ses.saldoInicial}</span>
+                      <span className='hidden md:block'>Saldo inicial: ${ses.saldoInicial}</span>
+                      <span className='hidden md:block'>Saldo final: ${ses.saldoFinal}</span>
+                      <span className='flex md:hidden'>final: ${ses.saldoFinal}</span>
 
                       <div className='ml-auto flex gap-3'>
                         {editingId !== ses.id && (
-                          <button onClick={() => startEdit(ses)} className='text-slate-400'>
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              stroke='currentColor'
-                              strokeWidth='2'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              className='w-4 h-4'>
-                              <path d='M12 20h9' />
-                              <path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z' />
-                            </svg>
+                          <button onClick={() => startEdit(ses)} className='text-slate-400 hover:text-cyan-400'>
+                            <EditIcon size={16} />
                           </button>
                         )}
 
-                        <button onClick={() => confirmDeleteOne(ses.id)} className='text-slate-400'>
-                          <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            className='w-4 h-4'>
-                            <path d='M3 6h18' />
-                            <path d='M8 6V4h8v2' />
-                            <path d='M6 6v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6' />
-                            <path d='M10 11v6' />
-                            <path d='M14 11v6' />
-                          </svg>
+                        <button onClick={() => confirmDeleteOne(ses.id)} className='text-slate-400 hover:text-rose-400'>
+                          <DeleteIcon size={16} />
                         </button>
                       </div>
                     </div>
@@ -227,33 +206,9 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
                           <div className='relative group'>
                             <button onClick={() => saveEdit(ses)}>
                               {savedId === ses.id ? (
-                                <svg
-                                  xmlns='http://www.w3.org/2000/svg'
-                                  width='14'
-                                  height='14'
-                                  viewBox='0 0 24 24'
-                                  fill='none'
-                                  stroke='currentColor'
-                                  strokeWidth='2.5'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                  className='text-emerald-400'>
-                                  <polyline points='20 6 9 17 4 12' />
-                                </svg>
+                                <CheckIcon size={14} className='text-emerald-400' />
                               ) : (
-                                <svg
-                                  xmlns='http://www.w3.org/2000/svg'
-                                  viewBox='0 0 24 24'
-                                  fill='none'
-                                  stroke='currentColor'
-                                  strokeWidth='2'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                  className='w-4 h-4 text-slate-400'>
-                                  <path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' />
-                                  <path d='M17 21v-8H7v8' />
-                                  <path d='M7 3v5h8' />
-                                </svg>
+                                <SaveIcon size={16} className='text-slate-400 hover:text-cyan-400' />
                               )}
                             </button>
 

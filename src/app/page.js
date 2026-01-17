@@ -263,16 +263,16 @@ export default function Dashboard() {
               {[
                 {
                   label: 'Gan/Per Hoy',
-                  val: pnlHoy,
+                  val: pnlHoy >= 0 ? pnlHoy : pnlHoy.slice(1),
                   color: parseFloat(pnlHoy) >= 0 ? 'text-emerald-200' : 'text-rose-300',
-                  prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '$'
+                  prefix: parseFloat(pnlHoy) >= 0 ? '+$' : '-$'
                 },
 
                 {
                   label: 'Gan/Per Gral.',
-                  val: pnlTotal,
+                  val: pnlTotal >= 0 ? pnlTotal : pnlTotal.slice(1),
                   color: parseFloat(pnlTotal) >= 0 ? 'text-cyan-400' : 'text-rose-400',
-                  prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '$'
+                  prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '-$'
                 },
 
                 { label: 'Sesiones hoy', val: sesionesHoy.length, color: 'text-blue-400', prefix: '' }

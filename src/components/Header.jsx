@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import MobileMenu from '@/components/MobileMenu'
 import { useDropdown } from '@/hooks/useDropdown'
+import { ChevronDownIcon, ClockIcon, CalendarIcon, UserIcon, MenuIcon, CloseIcon } from '@/components/icons'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -107,19 +108,10 @@ export default function Header() {
                   aria-controls='tools-menu'
                   className='flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors'>
                   Herramientas
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='14'
-                    height='14'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    className={`transition-transform duration-200 ${tools.open ? 'rotate-180' : ''}`}>
-                    <path d='m6 9 6 6 6-6' />
-                  </svg>
+                  <ChevronDownIcon
+                    size={14}
+                    className={`transition-transform duration-200 ${tools.open ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 <div
@@ -148,19 +140,7 @@ export default function Header() {
                       className='flex w-full items-center gap-3 px-3 py-2'>
                       {/* SVG intacto */}
                       <div className='p-1.5 bg-amber-500/10 rounded-lg text-amber-500'>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='16'
-                          height='16'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='2'>
-                          <rect width='18' height='18' x='3' y='4' rx='2' ry='2' />
-                          <line x1='16' x2='16' y1='2' y2='6' />
-                          <line x1='8' x2='8' y1='2' y2='6' />
-                          <line x1='3' x2='21' y1='10' y2='10' />
-                        </svg>
+                        <CalendarIcon size={16} />
                       </div>
                       <div>
                         <p className='text-sm text-white font-semibold'>Calendario Económico</p>
@@ -178,17 +158,7 @@ export default function Header() {
                       onClick={() => tools.setOpen(false)}
                       className='flex w-full items-center gap-3 px-3 py-2'>
                       <div className='p-1.5 bg-cyan-500/10 rounded-lg text-cyan-500'>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='16'
-                          height='16'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='2'>
-                          <circle cx='12' cy='12' r='10' />
-                          <polyline points='12 6 12 12 16 14' />
-                        </svg>
+                        <ClockIcon size={16} />
                       </div>
                       <div>
                         <p className='text-sm text-white font-semibold'>Sesiones de Mercado</p>
@@ -209,25 +179,14 @@ export default function Header() {
               </button>
             </nav>
 
-            <div className='h-8 w-px bg-slate-800 mx-2'></div>
+            <div className='hidden md:block h-8 w-px bg-slate-800 mx-2'></div>
 
             {/* PERFIL */}
             <div ref={profileRef} className='relative'>
               <button
                 onClick={() => setIsProfileOpen((p) => !p)}
                 className='w-10 h-10 rounded-full border-2 border-slate-700 hover:border-cyan-500 transition-all overflow-hidden bg-slate-800 flex items-center justify-center'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  className='text-slate-400'>
-                  <path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2' />
-                  <circle cx='12' cy='7' r='4' />
-                </svg>
+                <UserIcon size={20} className='text-slate-400' />
               </button>
 
               {isProfileOpen && (
@@ -248,25 +207,13 @@ export default function Header() {
                 </div>
               )}
             </div>
-
             {/* BOTÓN MENÚ MÓVIL */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label='Abrir menú'
+              aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
               aria-expanded={isMenuOpen}
-              className='lg:hidden text-slate-400'>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'>
-                {isMenuOpen ? <line x1='18' y1='6' x2='6' y2='18' /> : <line x1='3' y1='12' x2='21' y2='12' />}
-                {!isMenuOpen && <line x1='3' y1='6' x2='21' y2='6' />}
-                {!isMenuOpen && <line x1='3' y1='18' x2='21' y2='18' />}
-              </svg>
+              className='lg:hidden text-slate-400 hover:text-white transition-colors'>
+              {isMenuOpen ? <CloseIcon size={20} /> : <MenuIcon size={20} />}
             </button>
           </div>
         </div>

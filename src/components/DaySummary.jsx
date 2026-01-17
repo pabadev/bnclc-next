@@ -1,5 +1,7 @@
 'use client'
 
+import { LaunchIcon } from '@/components/icons'
+
 export default function DaySummary({ date, sessions }) {
   if (!sessions || sessions.length === 0) return null
 
@@ -24,6 +26,23 @@ export default function DaySummary({ date, sessions }) {
   }
 
   const formatMoney = (n) => `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+
+  // ───── Navegación a sesión ─────
+  const goToSession = (id) => {
+    const el = document.getElementById(`session-${id}`)
+    if (!el) return
+
+    el.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    })
+
+    // highlight temporal
+    el.classList.add('ring-2', 'ring-cyan-400')
+    setTimeout(() => {
+      el.classList.remove('ring-2', 'ring-cyan-400')
+    }, 1500)
+  }
 
   // ───── Orden ─────
   const ordered = [...sessions].sort((a, b) => toMinutes(b.horaInicio) - toMinutes(a.horaInicio))
@@ -70,8 +89,8 @@ export default function DaySummary({ date, sessions }) {
         </SummaryCard>
 
         <SummaryCard label='Gan/Per' valueClass={totalPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-          {totalPnL >= 0 ? '+' : ''}
-          {formatMoney(totalPnL)}
+          {totalPnL >= 0 ? '+' : '-'}
+          {formatMoney(totalPnL >= 0 ? totalPnL : totalPnL * -1)}
         </SummaryCard>
 
         <SummaryCard label='Saldo inicial'>{formatMoney(firstSaldo)}</SummaryCard>
@@ -90,25 +109,46 @@ export default function DaySummary({ date, sessions }) {
           const duration = sessionDuration(s.horaInicio, s.horaFin)
 
           return (
-            <div key={s.id} className='bg-[#161b26] border border-slate-800 rounded-lg px-3 py-2 text-xs space-y-1'>
-              {/* Fila superior */}
-              <div className='flex justify-between items-center'>
-                <span className='text-slate-400'>
-                  {s.horaInicio} – {s.horaFin}
-                </span>
+            <div key={s.id} className='bg-[#161b26] border border-slate-800 rounded-lg px-3 py-2 text-xs'>
+              <div className='flex justify-between items-stretch gap-3'>
+                {/* ───── Columna izquierda ───── */}
+                <div className='flex flex-col justify-between'>
+                  {/* Fila hora */}
+                  <span className='text-slate-400'>
+                    {s.horaInicio} – {s.horaFin}
+                  </span>
 
-                <span className={`font-mono ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {pnl >= 0 ? '+' : ''}
-                  {formatMoney(pnl)}
-                </span>
-              </div>
+                  {/* Fila saldo */}
+                  <span className='text-[10px] text-slate-500'>
+                    {formatMoney(saldoIni)} → {formatMoney(saldoFin)}
+                  </span>
 
-              {/* Fila inferior */}
-              <div className='flex justify-between text-[10px] text-slate-500'>
-                <span>
-                  {formatMoney(saldoIni)} → {formatMoney(saldoFin)}
-                </span>
-                {duration && <span>{duration}</span>}
+                  {duration && <span>{duration}</span>}
+                </div>
+
+                {/* ───── Columna derecha (centrada verticalmente) ───── */}
+                <div className='flex items-center gap-2'>
+                  <span className={`font-mono ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {pnl >= 0 ? '+' : '-'}
+                    {formatMoney(pnl >= 0 ? pnl : pnl * -1)}
+                  </span>
+
+                  {/* Botón ir a sesión */}
+                  <div className='relative group/tooltip'>
+                    <button
+                      type='button'
+                      onClick={() => goToSession(s.id)}
+                      className='flex items-center text-slate-500 hover:text-cyan-400 transition-colors'
+                      aria-label='Ver sesión en historial'>
+                      <LaunchIcon size={16} />
+                    </button>
+
+                    <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-lg border border-slate-700'>
+                      Ver sesión
+                      <span className='absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800'></span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           )
