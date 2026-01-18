@@ -275,7 +275,13 @@ export default function Dashboard() {
                   prefix: parseFloat(pnlTotal) >= 0 ? '+$' : '-$'
                 },
 
-                { label: 'Sesiones hoy', val: sesionesHoy.length, color: 'text-blue-400', prefix: '' }
+                {
+                  label: 'Sesiones hoy',
+                  val: sesionesHoy.length,
+                  color: 'text-blue-400',
+                  prefix: '',
+                  point: pnlHoy > 0 ? 'bg-emerald-400' : pnlHoy < 0 ? 'bg-rose-400' : 'bg-slate-400'
+                }
               ].map((card, i) => (
                 <div key={i} className='bg-[#161b26] p-3 rounded-xl border border-slate-800 text-center shadow-lg'>
                   <p className='text-[12px] text-slate-300 font-semibold tracking-wider mb-1'>{card.label}</p>
@@ -283,6 +289,7 @@ export default function Dashboard() {
                   <p className={`text-sm md:text-base font-mono font-semibold ${card.color}`}>
                     {card.prefix}
                     {card.val}
+                    {card.point && <span className={`inline-block w-2 h-2 rounded-full ml-2 ${card.point}`} />}
                   </p>
                 </div>
               ))}

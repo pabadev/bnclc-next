@@ -84,7 +84,19 @@ export default function SessionsCalendar({ sesiones }) {
 
           const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
           const hasSessions = groupedByDate[dateStr]
+          let dayPnL = 0
+          let dayIsPositive = false
+          let dayIsNegative = false
+
+          if (hasSessions) {
+            dayPnL = hasSessions.reduce((acc, s) => acc + parseFloat(s.pnl), 0)
+            dayIsPositive = dayPnL > 0
+            dayIsNegative = dayPnL < 0
+          }
+
           const isSelected = selectedDate === dateStr
+
+          const dotColor = dayIsPositive ? 'bg-emerald-400' : dayIsNegative ? 'bg-rose-400' : 'bg-slate-400'
 
           return (
             <div
@@ -96,7 +108,12 @@ export default function SessionsCalendar({ sesiones }) {
               `}>
               <span>{day}</span>
 
-              {hasSessions && <span className='mt-1 text-[10px] text-cyan-400 font-bold'>{hasSessions.length}</span>}
+              {hasSessions && (
+                <div className='mt-1 flex items-center justify-center gap-1 text-[10px] font-bold'>
+                  <span className='text-cyan-400'>{hasSessions.length}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                </div>
+              )}
             </div>
           )
         })}

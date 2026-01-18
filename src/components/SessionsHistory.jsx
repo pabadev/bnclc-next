@@ -83,7 +83,6 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
 
   const onChangeView = (value) => {
     setViewMode(value)
-    console.log(value)
   }
 
   // Formatea a fecha larga o corta según si es pantalla movil o no
@@ -105,6 +104,47 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
     })
     const longDate = formatted.charAt(0).toUpperCase() + formatted.slice(1)
     return longDate
+  }
+
+  // ───── Utils ─────
+  const toMinutes = (timeStr) => {
+    if (!timeStr) return null
+
+    const clean = timeStr.trim().toLowerCase()
+
+    // 24h format HH:mm
+    if (/^\d{1,2}:\d{2}$/.test(clean)) {
+      const [h, m] = clean.split(':').map(Number)
+      return h * 60 + m
+    }
+
+    // 12h format hh:mm am/pm
+    const match = clean.match(/^(\d{1,2}):(\d{2})\s?(am|pm)$/)
+    if (!match) return null
+
+    let [, h, m, period] = match
+    h = Number(h)
+    m = Number(m)
+
+    if (period === 'pm' && h !== 12) h += 12
+    if (period === 'am' && h === 12) h = 0
+
+    return h * 60 + m
+  }
+
+  const sessionDuration = (start, end) => {
+    const startMin = toMinutes(start)
+    const endMin = toMinutes(end)
+
+    if (startMin === null || endMin === null) return null
+
+    const diff = endMin - startMin
+    if (diff <= 0) return null
+
+    const h = Math.floor(diff / 60)
+    const m = diff % 60
+
+    return h > 0 ? `${h}h ${m}m` : `${m}m`
   }
 
   return (
@@ -135,10 +175,11 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
           </div>
         )}
 
-        <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3'>
+        <div className='flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-[940px]'>
           {viewMode === 'list' ? (
             sesiones.length > 0 ? (
               sesiones.map((ses) => {
+                const duration = sessionDuration(ses.horaInicio, ses.horaFin)
                 const isNoteValid = tempNote.trim().length > 0
 
                 return (
@@ -146,21 +187,30 @@ export default function SessionsHistory({ sesiones, onDelete, onUpdateNotes, onD
                     key={ses.id}
                     id={`session-${ses.id}`}
                     className='bg-[#0d1117] px-5 py-2 rounded-xl border border-slate-800 flex flex-col gap-2'>
-                    <div className='flex justify-between items-center'>
-                      <div className='flex items-center gap-2'>
+                    <div className='flex justify-between items-start'>
+                      <div className='flex items-start gap-2'>
                         <input
                           type='checkbox'
                           checked={selected.includes(ses.id)}
                           onChange={() => toggleSelect(ses.id)}
+                          className='mt-1'
                         />
-                        <span className='md:hidden text-[12px] text-slate-200 font-base'>
-                          {formatSessionDateShort(ses.fecha)}| {ses.horaInicio} a {ses.horaFin}
-                        </span>
-                        <span className='hidden md:block text-[12px] text-slate-200 font-base'>
-                          {formatSessionDateLong(ses.fecha)}| {ses.horaInicio} a {ses.horaFin}
-                        </span>
+
+                        <div className='flex flex-col'>
+                          {/* Fecha + horas */}
+                          <span className='md:hidden text-[12px] text-slate-200'>
+                            {formatSessionDateShort(ses.fecha)} | {ses.horaInicio} a {ses.horaFin}
+                          </span>
+                          <span className='hidden md:block text-[12px] text-slate-200'>
+                            {formatSessionDateLong(ses.fecha)} | {ses.horaInicio} a {ses.horaFin}
+                          </span>
+
+                          {/* Duración */}
+                          {duration && <span className='text-[10px] text-slate-400 mt-0.5'>Duración: {duration}</span>}
+                        </div>
                       </div>
 
+                      {/* PnL */}
                       <span
                         className={`text-[15px] font-mono ${
                           parseFloat(ses.pnl) >= 0 ? 'text-emerald-500' : 'text-rose-400'

@@ -7,13 +7,27 @@ export default function DaySummary({ date, sessions }) {
 
   // ───── Utils ─────
   const toMinutes = (timeStr) => {
-    const match = timeStr.match(/(\d+):(\d+)\s*([ap])/i)
-    if (!match) return 0
-    let [, hours, minutes, period] = match
-    let h = parseInt(hours, 10)
-    let m = parseInt(minutes, 10)
-    if (period.toLowerCase() === 'p' && h !== 12) h += 12
-    if (period.toLowerCase() === 'a' && h === 12) h = 0
+    if (!timeStr) return null
+
+    const clean = timeStr.trim().toLowerCase()
+
+    // 24h format HH:mm
+    if (/^\d{1,2}:\d{2}$/.test(clean)) {
+      const [h, m] = clean.split(':').map(Number)
+      return h * 60 + m
+    }
+
+    // 12h format hh:mm am/pm
+    const match = clean.match(/^(\d{1,2}):(\d{2})\s?(am|pm)$/)
+    if (!match) return null
+
+    let [, h, m, period] = match
+    h = Number(h)
+    m = Number(m)
+
+    if (period === 'pm' && h !== 12) h += 12
+    if (period === 'am' && h === 12) h = 0
+
     return h * 60 + m
   }
 
@@ -73,7 +87,7 @@ export default function DaySummary({ date, sessions }) {
   return (
     <div className='bg-[#0d1117] border border-slate-800 rounded-2xl p-4 space-y-4'>
       {/* ───── Header ───── */}
-      <div className='text-center text-xs text-slate-400 tracking-widest'>{capitalizedDate}</div>
+      <div className='text-center text-xs text-slate-300 tracking-widest'>{capitalizedDate}</div>
 
       {/* ───── Summary cards ───── */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-xs'>
@@ -114,16 +128,16 @@ export default function DaySummary({ date, sessions }) {
                 {/* ───── Columna izquierda ───── */}
                 <div className='flex flex-col justify-between'>
                   {/* Fila hora */}
-                  <span className='text-slate-400'>
+                  <span className='text-slate-300'>
                     {s.horaInicio} – {s.horaFin}
                   </span>
 
                   {/* Fila saldo */}
-                  <span className='text-[10px] text-slate-500'>
+                  <span className='text-[10px] text-slate-400'>
                     {formatMoney(saldoIni)} → {formatMoney(saldoFin)}
                   </span>
 
-                  {duration && <span>{duration}</span>}
+                  {duration && <span className='text-[10px] text-slate-400'>{duration}</span>}
                 </div>
 
                 {/* ───── Columna derecha (centrada verticalmente) ───── */}
@@ -161,7 +175,7 @@ export default function DaySummary({ date, sessions }) {
 function SummaryCard({ label, children, valueClass = '' }) {
   return (
     <div className='bg-[#161b26] border border-slate-800 rounded-xl p-3 text-center'>
-      <div className='text-[10px] text-slate-400 uppercase tracking-wider'>{label}</div>
+      <div className='text-[10px] text-slate-300 uppercase tracking-wider'>{label}</div>
       <div className={`mt-1 font-semibold ${valueClass}`}>{children}</div>
     </div>
   )
